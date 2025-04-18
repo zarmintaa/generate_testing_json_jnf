@@ -15,6 +15,8 @@ const {
   fileName,
   type,
   template,
+  jsonName,
+  sourceSystem,
 } = storeToRefs(fileStore);
 
 const { processFile, downloadJson, downloadExcel } = fileStore;
@@ -83,12 +85,29 @@ const handleFileChange = (event) => {
             <span v-else>Process</span>
           </button>
 
-          <div v-if="fileName" class="mt-3">
-            <strong>File processed:</strong> {{ fileName }}
-          </div>
+          <div class="card mt-4">
+            <div class="card-header">
+              <div>Setting Properties</div>
+            </div>
+            <div class="card-body">
+              <div class="mb-2">
+                <strong>File processed:</strong>
+                {{ fileName || "File didn't process yet" }}
+              </div>
 
-          <div class="mt-3">
-            <strong>Document Number:</strong> {{ docNo || "Not specified" }}
+              <div class="mb-2">
+                <strong>Document Number:</strong> {{ docNo || "Not specified" }}
+              </div>
+
+              <div class="mb-2">
+                <strong>JSON Name:</strong> {{ jsonName || "Not specified" }}
+              </div>
+
+              <div class="mb-2">
+                <strong>Source System:</strong>
+                {{ sourceSystem || "Not specified" }}
+              </div>
+            </div>
           </div>
 
           <div v-if="fileData" class="mt-4">
