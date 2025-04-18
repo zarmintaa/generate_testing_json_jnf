@@ -12,6 +12,11 @@ const { docNo, jsonName, sourceSystem } = storeToRefs(fileStore);
 const templatePreview = ref(null);
 const uploadError = ref(null);
 
+// Validation states
+const docNoError = ref("");
+const jsonNameError = ref("");
+const sourceSystemError = ref("");
+
 const handleFileChange = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -26,17 +31,66 @@ const handleFileChange = async (event) => {
   }
 };
 
-const updateTemplatePreview = () => {
-  templatePreview.value = fileStore.setJsonTemplateProperties({
-    docNo: docNo.value,
-    jsonName: jsonName.value,
-    sourceSystem: sourceSystem.value,
-  });
+const validateDocNo = () => {
+  if (docNo.value.length > 12) {
+    docNoError.value = "Document Number cannot exceed 12 characters";
+    docNo.value = docNo.value.slice(0, 12);
+    return false;
+  }
+  if (!docNo.value) {
+    docNoError.value = "Document Number is required";
+    return false;
+  }
+  docNoError.value = "";
+  return true;
 };
 
-watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
-  immediate: true,
-});
+const validateJsonName = () => {
+  if (!jsonName.value) {
+    jsonNameError.value = "JSON Name is required";
+    return false;
+  }
+  jsonNameError.value = "";
+  return true;
+};
+
+const validateSourceSystem = () => {
+  if (!sourceSystem.value) {
+    sourceSystemError.value = "Source System is required";
+    return false;
+  }
+  sourceSystemError.value = "";
+  return true;
+};
+
+const updateTemplatePreview = () => {
+  if (validateDocNo() && validateJsonName() && validateSourceSystem()) {
+    templatePreview.value = fileStore.setJsonTemplateProperties({
+      docNo: docNo.value,
+      jsonName: jsonName.value,
+      sourceSystem: sourceSystem.value,
+    });
+  } else {
+    templatePreview.value = null;
+  }
+};
+
+const handleDocNoInput = (event) => {
+  if (event.target.value.length >= 12 && event.data) {
+    event.preventDefault();
+  }
+};
+
+watch(
+  [docNo, jsonName, sourceSystem],
+  () => {
+    updateTemplatePreview();
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+);
 </script>
 
 <template>
@@ -46,27 +100,42 @@ watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
         <h5 class="text-black">{{ title }}</h5>
       </div>
       <div class="card-body">
-        <!-- Form inputs remain the same -->
-        <div class="mb-3">
-          <label for="docNo" class="form-label">Document Number</label>
-          <input
-            v-model="docNo"
-            class="form-control"
-            type="text"
-            id="docNo"
-            placeholder="Enter Document Number"
-          />
-        </div>
         <form @submit.prevent>
+          <div class="mb-3">
+            <label for="docNo" class="form-label">Document Number</label>
+            <input
+              v-model="docNo"
+              class="form-control"
+              :class="{ 'is-invalid': docNoError }"
+              type="text"
+              id="docNo"
+              placeholder="Format: DDMMYYR###### (12 characters)"
+              maxlength="12"
+              @input="handleDocNoInput"
+              @blur="validateDocNo"
+            />
+            <div v-if="docNoError" class="invalid-feedback">
+              {{ docNoError }}
+            </div>
+            <div class="small text-muted mt-1">
+              Fomat: (12 characters total)
+            </div>
+          </div>
+
           <div class="mb-3">
             <label for="jsonName" class="form-label">JSON Name</label>
             <input
               v-model="jsonName"
               class="form-control"
+              :class="{ 'is-invalid': jsonNameError }"
               type="text"
               id="jsonName"
               placeholder="Enter JSON Name"
+              @blur="validateJsonName"
             />
+            <div v-if="jsonNameError" class="invalid-feedback">
+              {{ jsonNameError }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -74,30 +143,17 @@ watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
             <input
               v-model="sourceSystem"
               class="form-control"
+              :class="{ 'is-invalid': sourceSystemError }"
               type="text"
               id="sourceSystem"
               placeholder="Enter Source System"
+              @blur="validateSourceSystem"
             />
+            <div v-if="sourceSystemError" class="invalid-feedback">
+              {{ sourceSystemError }}
+            </div>
           </div>
         </form>
-
-        <!--          <form>-->
-        <!--            <div class="mb-3">-->
-        <!--              <label for="newTemplate" class="form-label"-->
-        <!--                >Upload Template</label-->
-        <!--              >-->
-        <!--              <input-->
-        <!--                class="form-control"-->
-        <!--                type="file"-->
-        <!--                id="newTemplate"-->
-        <!--                accept=".json"-->
-        <!--                @change="handleFileChange"-->
-        <!--              />-->
-        <!--              <div v-if="uploadError" class="text-danger mt-2">-->
-        <!--                {{ uploadError }}-->
-        <!--              </div>-->
-        <!--            </div>-->
-        <!--          </form>-->
 
         <div class="card mt-4">
           <div class="card-header">
@@ -105,16 +161,24 @@ watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
           </div>
           <div class="card-body">
             <div class="mb-2">
-              <strong>Document Number:</strong> {{ docNo || "Not specified" }}
+              <strong>Document Number:</strong>
+              <span :class="{ 'text-danger': docNoError }">
+                {{ docNo || "Not specified" }}
+              </span>
             </div>
 
             <div class="mb-2">
-              <strong>JSON Name:</strong> {{ jsonName || "Not specified" }}
+              <strong>JSON Name:</strong>
+              <span :class="{ 'text-danger': jsonNameError }">
+                {{ jsonName || "Not specified" }}
+              </span>
             </div>
 
             <div class="mb-2">
               <strong>Source System:</strong>
-              {{ sourceSystem || "Not specified" }}
+              <span :class="{ 'text-danger': sourceSystemError }">
+                {{ sourceSystem || "Not specified" }}
+              </span>
             </div>
           </div>
         </div>
@@ -135,8 +199,7 @@ watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
 </template>
 
 <style scoped>
-/* Your existing styles remain the same */
-.card-header-pills {
+.card-header-tabs {
   background-color: #f8f9fa;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   padding: 0.75rem 1.25rem;
@@ -158,5 +221,24 @@ pre {
 
 .text-danger {
   color: #dc3545;
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.small {
+  font-size: 0.875em;
+}
+
+.text-muted {
+  color: #6c757d !important;
 }
 </style>

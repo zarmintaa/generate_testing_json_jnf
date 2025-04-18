@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useFileStore } from "../store/fileStore.js";
 import Layout from "./Layout.vue";
+import { ref, watch } from "vue";
 
 const fileStore = useFileStore();
 const { title } = defineProps({
@@ -24,6 +25,20 @@ const {
 
 const { processFile, downloadJson, downloadExcel } = fileStore;
 
+// State untuk validasi
+const docNoError = ref("");
+
+// Watch perubahan pada docNo
+watch(docNo, (newValue) => {
+  if (newValue.length > 12) {
+    docNoError.value = "Document Number tidak boleh lebih dari 12 karakter";
+    // Potong ke 12 karakter
+    docNo.value = newValue.slice(0, 12);
+  } else {
+    docNoError.value = "";
+  }
+});
+
 // Handle file input changes
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -31,6 +46,13 @@ const handleFileChange = (event) => {
     fileStore.jsonFileInput = file;
   } else {
     fileStore.excelFileInput = file;
+  }
+};
+
+// Handle input untuk mencegah lebih dari 12 karakter
+const handleDocNoInput = (event) => {
+  if (event.target.value.length >= 12 && event.data) {
+    event.preventDefault();
   }
 };
 </script>
@@ -48,10 +70,17 @@ const handleFileChange = (event) => {
             <input
               v-model="docNo"
               class="form-control"
+              :class="{ 'is-invalid': docNoError }"
               type="text"
               id="docNo"
-              placeholder="Enter Document Number"
+              placeholder="Contoh: 020125R000582"
+              maxlength="12"
+              @input="handleDocNoInput"
             />
+            <div v-if="docNoError" class="invalid-feedback">
+              {{ docNoError }}
+            </div>
+            <div class="small text-muted mt-1">Format: (12 karakter total)</div>
           </div>
 
           <div class="mb-3">
@@ -156,21 +185,6 @@ const handleFileChange = (event) => {
             >
               Download JSON Template
             </button>
-            <!--          <button-->
-            <!--            v-else-->
-            <!--            @click="downloadExcel"-->
-            <!--            class="btn btn-success"-->
-            <!--            :disabled="isProses"-->
-            <!--          >-->
-            <!--            <span v-if="isProses" class="d-flex align-items-center gap-2">-->
-            <!--              <span-->
-            <!--                class="spinner-border spinner-border-sm"-->
-            <!--                role="status"-->
-            <!--              ></span>-->
-            <!--              Generating...-->
-            <!--            </span>-->
-            <!--            <span v-else>Download Excel</span>-->
-            <!--          </button>-->
           </div>
         </div>
       </div>
@@ -179,7 +193,6 @@ const handleFileChange = (event) => {
 </template>
 
 <style scoped>
-/* Your existing styles remain the same */
 .table-responsive {
   max-height: 400px;
   overflow-y: auto;
@@ -231,5 +244,16 @@ pre {
 
 .gap-2 {
   gap: 0.5rem;
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
 }
 </style>
