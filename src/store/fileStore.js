@@ -5,13 +5,15 @@ import * as ExcelJS from "exceljs";
 export const useFileStore = defineStore("file", {
   state: () => ({
     fileType: "JSON",
-    docNo: "",
+    docNo: Math.random().toString(36).substring(2, 14),
     isProses: false,
     fileData: null,
     errorMessage: null,
     fileName: "",
     jsonFileInput: null,
     excelFileInput: null,
+    jsonName: "MASTER",
+    sourceSystem: "AMAN",
     template: {
       data: [
         {
@@ -33,15 +35,25 @@ export const useFileStore = defineStore("file", {
         state.template.data[0].msgContent = [item];
         return state.template;
       });
-
-      // return state.fileData.data.map(
-      //   (result) => (state.template.data[0].msgContent = [...result]),
-      // );
     },
   },
   actions: {
-    setJsonTemplate(data) {
-      this.template.data[0].msgContent = [...data];
+    setJsonTemplate(payload) {
+      // Create completely new template object
+      const newTemplate = {
+        data: [
+          {
+            fastSeqNo: "1",
+            msgContent: [],
+            jsonName: payload.jsonName || this.jsonName,
+            sourceSystem: payload.sourceSystem || this.sourceSystem,
+            senderDocNo: payload.docNo || this.docNo,
+          },
+        ],
+      };
+
+      this.template = newTemplate;
+      return newTemplate; // Return the new template
     },
 
     async processFile() {

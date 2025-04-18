@@ -1,8 +1,31 @@
 <script setup>
-import Form from "./Form.vue";
+import { ref, watch } from "vue";
+import { useFileStore } from "../store/fileStore";
+import { storeToRefs } from "pinia";
+import Layout from "./Layout.vue";
 import Sidebar from "./Sidebar.vue";
 import Content from "./Content.vue";
-import Layout from "./Layout.vue";
+
+const fileStore = useFileStore();
+
+// Reactive references from store
+const { docNo, jsonName, sourceSystem, template } = storeToRefs(fileStore);
+
+// Local reactive reference for preview
+const templatePreview = ref(null);
+
+// Watch for changes and update template
+watch(
+  [docNo, jsonName, sourceSystem],
+  ([newDocNo, newJsonName, newSourceSystem]) => {
+    templatePreview.value = fileStore.setJsonTemplate({
+      docNo: newDocNo,
+      jsonName: newJsonName,
+      sourceSystem: newSourceSystem,
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -11,38 +34,94 @@ import Layout from "./Layout.vue";
     <Content>
       <div class="card">
         <div class="card-header card-header-pills">
-          <h5 class="text-black">Manual Template</h5>
+          <h5 class="text-black">Setting Template</h5>
         </div>
         <div class="card-body">
+          <div class="mb-3">
+            <label for="docNo" class="form-label">Document Number</label>
+            <input
+              v-model="docNo"
+              class="form-control"
+              type="text"
+              id="docNo"
+              placeholder="Enter Document Number"
+            />
+          </div>
+
           <form @submit.prevent>
             <div class="mb-3">
-              <label for="formFile" class="form-label"
-                >Upload Json Template</label
-              >
+              <label for="jsonName" class="form-label">JSON Name</label>
               <input
+                v-model="jsonName"
                 class="form-control"
-                type="file"
-                name="file_templae_json"
-                id="file-json"
-                accept=".json"
+                type="text"
+                id="jsonName"
+                placeholder="Enter JSON Name"
               />
             </div>
+
             <div class="mb-3">
-              <label for="formFile" class="form-label">Upload Json Data</label>
+              <label for="sourceSystem" class="form-label">Source System</label>
               <input
+                v-model="sourceSystem"
                 class="form-control"
-                type="file"
-                name="json_date"
-                id="file-json"
-                accept=".json"
+                type="text"
+                id="sourceSystem"
+                placeholder="Enter Source System"
               />
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
           </form>
+
+          <div class="card mt-4">
+            <div class="card-header">
+              <div>Preview</div>
+            </div>
+            <div class="card-body">
+              <div class="mb-2">
+                <strong>Document Number:</strong> {{ docNo || "Not specified" }}
+              </div>
+
+              <div class="mb-2">
+                <strong>JSON Name:</strong> {{ jsonName || "Not specified" }}
+              </div>
+
+              <div class="mb-2">
+                <strong>Source System:</strong>
+                {{ sourceSystem || "Not specified" }}
+              </div>
+            </div>
+          </div>
+
+          <div v-if="templatePreview" class="mt-4">
+            <h5>Template JSON Structure</h5>
+            <pre class="bg-light p-3 rounded">{{
+              JSON.stringify(templatePreview, null, 2)
+            }}</pre>
+          </div>
         </div>
       </div>
     </Content>
   </Layout>
 </template>
 
-<style scoped></style>
+<style scoped>
+.card-header-pills {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.rounded {
+  border-radius: 0.25rem !important;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 0;
+}
+</style>
