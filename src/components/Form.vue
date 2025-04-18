@@ -5,8 +5,16 @@ import { useFileStore } from "../store/fileStore.js";
 const fileStore = useFileStore();
 
 // Extract state and actions from the store
-const { fileType, docNo, isProses, fileData, errorMessage, fileName, type } =
-  storeToRefs(fileStore);
+const {
+  fileType,
+  docNo,
+  isProses,
+  fileData,
+  errorMessage,
+  fileName,
+  type,
+  template,
+} = storeToRefs(fileStore);
 
 const { processFile, downloadJson, downloadExcel } = fileStore;
 
@@ -103,7 +111,7 @@ const handleFileChange = (event) => {
         <div v-if="fileData && fileData.type === 'json'" class="mt-3">
           <h5>Raw JSON Data</h5>
           <pre class="bg-light p-3 rounded">{{
-            JSON.stringify(fileData.data, null, 2)
+            JSON.stringify(template, null, 2)
           }}</pre>
         </div>
 

@@ -7,7 +7,7 @@
         to="/"
         class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
         active-class="active_page"
-        >Manual Template</RouterLink
+        >Setting Template</RouterLink
       >
       <RouterLink
         to="ppd-baru"
@@ -15,11 +15,11 @@
         active-class="active_page"
         >PPD Baru</RouterLink
       >
-      <RouterLink
+      <!--      <RouterLink
         to="#"
         class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
         >Angsuran</RouterLink
-      >
+      >-->
     </div>
   </div>
 </template>

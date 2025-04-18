@@ -1,4 +1,7 @@
 <script setup>
+import Sidebar from "./Sidebar.vue";
+import Content from "./Content.vue";
+
 console.log("Home");
 </script>
 
@@ -6,7 +9,10 @@ console.log("Home");
   <div class="container-fluid my-5">
     <div class="container">
       <div class="row">
-        <slot />
+        <Sidebar />
+        <Content>
+          <slot />
+        </Content>
       </div>
     </div>
   </div>
