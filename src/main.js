@@ -12,12 +12,18 @@ const router = createRouter({
     {
       path: "/",
       component: () => import("./components/Home.vue"),
-      name: "home",
+      name: "setting-template",
+      props: {
+        title: "Setting Template",
+      },
     },
     {
       path: "/ppd-baru",
       component: () => import("./components/PpdBaru.vue"),
       name: "ppd-baru",
+      props: {
+        title: "PPD Baru",
+      },
     },
   ],
   history: createWebHistory(),

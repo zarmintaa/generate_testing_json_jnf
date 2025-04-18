@@ -4,6 +4,9 @@ import { useFileStore } from "../store/fileStore.js";
 import Layout from "./Layout.vue";
 
 const fileStore = useFileStore();
+const { title } = defineProps({
+  title: String,
+});
 
 // Extract state and actions from the store
 const {
@@ -36,6 +39,9 @@ const handleFileChange = (event) => {
   <Layout>
     <div class="container-fluid">
       <div class="card">
+        <div class="card-header card-header-tabs">
+          <h5 class="text-black">{{ title }}</h5>
+        </div>
         <div class="card-body">
           <div class="mb-3">
             <label for="docNo" class="form-label">Document Number</label>

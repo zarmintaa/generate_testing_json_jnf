@@ -2,10 +2,23 @@
 import { defineStore } from "pinia";
 import * as ExcelJS from "exceljs";
 
+// Fungsi untuk generate nomor dokumen dengan format DDMMYYR######
+function generateDocNo() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = String(now.getFullYear()).slice(-2);
+  const randomNum = String(Math.floor(Math.random() * 999999) + 1).padStart(
+    6,
+    "0",
+  );
+  return `${day}${month}${year}R${randomNum}`;
+}
+
 export const useFileStore = defineStore("file", {
   state: () => ({
     fileType: "JSON",
-    docNo: Math.random().toString(36).substring(2, 14),
+    docNo: generateDocNo(),
     isProses: false,
     fileData: null,
     errorMessage: null,
@@ -21,12 +34,13 @@ export const useFileStore = defineStore("file", {
           msgContent: [],
           jsonName: "MASTER",
           sourceSystem: "AMAN",
-          senderDocNo: Math.random().toString(36).substring(2, 14),
+          senderDocNo: generateDocNo(),
         },
       ],
     },
-    uploadedTemplate: null, // Added for uploaded template storage
+    uploadedTemplate: null,
   }),
+
   getters: {
     type: (state) => state.fileType,
     currentTemplate: (state) => state.uploadedTemplate || state.template,
@@ -38,6 +52,7 @@ export const useFileStore = defineStore("file", {
       return currentTemplate;
     },
   },
+
   actions: {
     async setNewTemplate(file) {
       try {
@@ -58,11 +73,10 @@ export const useFileStore = defineStore("file", {
           ...item,
           jsonName: payload.jsonName || this.jsonName,
           sourceSystem: payload.sourceSystem || this.sourceSystem,
-          senderDocNo: payload.docNo || this.docNo,
+          senderDocNo: payload.docNo || generateDocNo(),
         })),
       };
 
-      // Update both template and uploadedTemplate if exists
       if (this.uploadedTemplate) {
         this.uploadedTemplate = updatedTemplate;
       } else {
@@ -180,7 +194,7 @@ export const useFileStore = defineStore("file", {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo || "data"}.json`;
+      a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo}.json`;
       a.click();
       URL.revokeObjectURL(url);
     },
@@ -259,7 +273,7 @@ export const useFileStore = defineStore("file", {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo || "data"}.xlsx`;
+        a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
       } catch (error) {

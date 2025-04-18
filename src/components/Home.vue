@@ -3,9 +3,10 @@ import { ref, watch } from "vue";
 import { useFileStore } from "../store/fileStore";
 import { storeToRefs } from "pinia";
 import Layout from "./Layout.vue";
-import Sidebar from "./Sidebar.vue";
-import Content from "./Content.vue";
 
+const { title } = defineProps({
+  title: String,
+});
 const fileStore = useFileStore();
 const { docNo, jsonName, sourceSystem } = storeToRefs(fileStore);
 const templatePreview = ref(null);
@@ -42,7 +43,7 @@ watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
   <Layout>
     <div class="card">
       <div class="card-header card-header-tabs">
-        <h5 class="text-black">Setting Template</h5>
+        <h5 class="text-black">{{ title }}</h5>
       </div>
       <div class="card-body">
         <!-- Form inputs remain the same -->
