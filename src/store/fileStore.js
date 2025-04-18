@@ -25,35 +25,51 @@ export const useFileStore = defineStore("file", {
         },
       ],
     },
+    uploadedTemplate: null, // Added for uploaded template storage
   }),
   getters: {
     type: (state) => state.fileType,
+    currentTemplate: (state) => state.uploadedTemplate || state.template,
     formattedData: (state) => {
       if (!state.fileData?.data) return { data: [] };
 
-      return state.fileData.data.map((item) => {
-        state.template.data[0].msgContent = [item];
-        return state.template;
-      });
+      const currentTemplate = JSON.parse(JSON.stringify(state.currentTemplate));
+      currentTemplate.data[0].msgContent = state.fileData.data;
+      return currentTemplate;
     },
   },
   actions: {
-    setJsonTemplate(payload) {
-      // Create completely new template object
-      const newTemplate = {
-        data: [
-          {
-            fastSeqNo: "1",
-            msgContent: [],
-            jsonName: payload.jsonName || this.jsonName,
-            sourceSystem: payload.sourceSystem || this.sourceSystem,
-            senderDocNo: payload.docNo || this.docNo,
-          },
-        ],
+    async setNewTemplate(file) {
+      try {
+        const content = await this.readJsonFile(file);
+        this.uploadedTemplate = content;
+        return content;
+      } catch (error) {
+        console.error("Error loading template:", error);
+        throw error;
+      }
+    },
+
+    setJsonTemplateProperties(payload) {
+      const currentTemplate = JSON.parse(JSON.stringify(this.currentTemplate));
+
+      const updatedTemplate = {
+        data: currentTemplate.data.map((item) => ({
+          ...item,
+          jsonName: payload.jsonName || this.jsonName,
+          sourceSystem: payload.sourceSystem || this.sourceSystem,
+          senderDocNo: payload.docNo || this.docNo,
+        })),
       };
 
-      this.template = newTemplate;
-      return newTemplate; // Return the new template
+      // Update both template and uploadedTemplate if exists
+      if (this.uploadedTemplate) {
+        this.uploadedTemplate = updatedTemplate;
+      } else {
+        this.template = updatedTemplate;
+      }
+
+      return updatedTemplate;
     },
 
     async processFile() {

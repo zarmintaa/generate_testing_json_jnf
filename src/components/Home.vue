@@ -7,25 +7,35 @@ import Sidebar from "./Sidebar.vue";
 import Content from "./Content.vue";
 
 const fileStore = useFileStore();
-
-// Reactive references from store
-const { docNo, jsonName, sourceSystem, template } = storeToRefs(fileStore);
-
-// Local reactive reference for preview
+const { docNo, jsonName, sourceSystem } = storeToRefs(fileStore);
 const templatePreview = ref(null);
+const uploadError = ref(null);
 
-// Watch for changes and update template
-watch(
-  [docNo, jsonName, sourceSystem],
-  ([newDocNo, newJsonName, newSourceSystem]) => {
-    templatePreview.value = fileStore.setJsonTemplate({
-      docNo: newDocNo,
-      jsonName: newJsonName,
-      sourceSystem: newSourceSystem,
-    });
-  },
-  { immediate: true },
-);
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    uploadError.value = null;
+    await fileStore.setNewTemplate(file);
+    updateTemplatePreview();
+  } catch (error) {
+    console.error("Template upload failed:", error);
+    uploadError.value = error.message || "Invalid template file";
+  }
+};
+
+const updateTemplatePreview = () => {
+  templatePreview.value = fileStore.setJsonTemplateProperties({
+    docNo: docNo.value,
+    jsonName: jsonName.value,
+    sourceSystem: sourceSystem.value,
+  });
+};
+
+watch([docNo, jsonName, sourceSystem], () => updateTemplatePreview(), {
+  immediate: true,
+});
 </script>
 
 <template>
@@ -37,6 +47,7 @@ watch(
           <h5 class="text-black">Setting Template</h5>
         </div>
         <div class="card-body">
+          <!-- Form inputs remain the same -->
           <div class="mb-3">
             <label for="docNo" class="form-label">Document Number</label>
             <input
@@ -72,6 +83,24 @@ watch(
             </div>
           </form>
 
+          <!--          <form>-->
+          <!--            <div class="mb-3">-->
+          <!--              <label for="newTemplate" class="form-label"-->
+          <!--                >Upload Template</label-->
+          <!--              >-->
+          <!--              <input-->
+          <!--                class="form-control"-->
+          <!--                type="file"-->
+          <!--                id="newTemplate"-->
+          <!--                accept=".json"-->
+          <!--                @change="handleFileChange"-->
+          <!--              />-->
+          <!--              <div v-if="uploadError" class="text-danger mt-2">-->
+          <!--                {{ uploadError }}-->
+          <!--              </div>-->
+          <!--            </div>-->
+          <!--          </form>-->
+
           <div class="card mt-4">
             <div class="card-header">
               <div>Preview</div>
@@ -105,6 +134,7 @@ watch(
 </template>
 
 <style scoped>
+/* Your existing styles remain the same */
 .card-header-pills {
   background-color: #f8f9fa;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
@@ -123,5 +153,9 @@ pre {
   white-space: pre-wrap;
   word-wrap: break-word;
   margin-bottom: 0;
+}
+
+.text-danger {
+  color: #dc3545;
 }
 </style>
