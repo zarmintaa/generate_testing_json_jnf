@@ -1,277 +1,85 @@
 <script setup>
-import { reactive, ref, watchEffect } from "vue";
-import * as ExcelJS from "exceljs";
+import { storeToRefs } from "pinia";
+import { useFileStore } from "../store/fileStore.js";
 
-const inputRef = reactive({
-  fileType: "JSON",
-});
+const fileStore = useFileStore();
 
-const templateObject = {
-  data: [
-    {
-      fastSeqNo: "1",
-      msgContent: [],
-      jsonName: "MASTER",
-      sourceSystem: "AMAN",
-      senderDocNo: "121213",
-    },
-  ],
-};
+// Extract state and actions from the store
+const { fileType, docNo, isProses, fileData, errorMessage, fileName, type } =
+  storeToRefs(fileStore);
 
-const transformObjectToString = (data) => {
-  const tempData = [];
-  console.log(data.value.data);
-  data.value.data.map((result) => {
-    tempData.push(
-      JSON.stringify({
-        data: { ...result },
-      }),
-    );
-  });
+const { processFile, downloadJson, downloadExcel } = fileStore;
 
-  return {
-    data: [
-      {
-        fastSeqNo: "1",
-        msgContent: [...tempData],
-        jsonName: "MASTER",
-        sourceSystem: "AMAN",
-        senderDocNo: "121213",
-      },
-    ],
-  };
-};
-
-const type = ref("JSON");
-const docNo = ref("");
-const isProses = ref(false);
-const fileData = ref(null); // To store parsed file data
-const errorMessage = ref(null); // To store any error messages
-const fileName = ref(""); // To store the uploaded file name
-
-const onProses = async () => {
-  isProses.value = true;
-  errorMessage.value = null;
-  fileData.value = null;
-
-  try {
-    if (type.value === "EXCEL") {
-      const fileInput = document.getElementById("file-excel");
-      await handleExcelUpload(fileInput);
-    } else {
-      const fileInput = document.getElementById("file-json");
-      await handleJsonUpload(fileInput);
-    }
-  } catch (error) {
-    console.error("Error processing file:", error);
-    errorMessage.value = error.message || "Failed to process file";
-  } finally {
-    isProses.value = false;
+// Handle file input changes
+const handleFileChange = (event) => {
+  const file = event.target.files[0];
+  if (fileType.value === "JSON") {
+    fileStore.jsonFileInput = file;
+  } else {
+    fileStore.excelFileInput = file;
   }
-
-  /* console.log({
-    data: fileData?.value?.data,
-    headers: fileData?.value?.headers,
-    type: fileData?.value?.type,
-  });*/
 };
-
-const handleExcelUpload = async (fileInput) => {
-  if (fileInput.files.length === 0) {
-    throw new Error("Please select an Excel file first");
-  }
-
-  const file = fileInput.files[0];
-  fileName.value = file.name;
-
-  const data = await readExcelFile(file);
-
-  fileData.value = {
-    type: "excel",
-    data: data,
-    headers: data.length > 0 ? Object.keys(data[0]) : [],
-  };
-};
-
-const handleJsonUpload = async (fileInput) => {
-  if (fileInput.files.length === 0) {
-    throw new Error("Please select a JSON file first");
-  }
-
-  const file = fileInput.files[0];
-  fileName.value = file.name;
-
-  const data = await readJsonFile(file);
-
-  const allKeys = new Set();
-  const jsonArray = Array.isArray(data) ? data : [data];
-
-  jsonArray.forEach((item) => {
-    Object.keys(item).forEach((key) => allKeys.add(key));
-  });
-
-  fileData.value = {
-    type: "json",
-    data: jsonArray,
-    headers: Array.from(allKeys),
-  };
-};
-
-const readExcelFile = async (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-      try {
-        const buffer = e.target.result;
-        const workbook = new ExcelJS.Workbook();
-        await workbook.xlsx.load(buffer);
-
-        const worksheet = workbook.worksheets[0];
-        const data = [];
-
-        // Get headers from first row
-        const headers = [];
-        const headerRow = worksheet.getRow(1);
-        headerRow.eachCell((cell, colNumber) => {
-          headers[colNumber - 1] = cell.value;
-        });
-
-        // Process remaining rows
-        worksheet.eachRow((row, rowNumber) => {
-          if (rowNumber === 1) return; // Skip header row
-
-          const rowData = {};
-          row.eachCell((cell, colNumber) => {
-            rowData[headers[colNumber - 1]] = cell.value;
-          });
-          data.push(rowData);
-        });
-
-        resolve(data);
-      } catch (error) {
-        reject(error);
-      }
-    };
-
-    reader.onerror = (error) => reject(error);
-    reader.readAsArrayBuffer(file);
-  });
-};
-
-const readJsonFile = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      try {
-        const content = e.target.result;
-        const jsonData = JSON.parse(content);
-        resolve(jsonData);
-      } catch (error) {
-        reject(new Error("Invalid JSON file format"));
-      }
-    };
-
-    reader.onerror = (error) => reject(error);
-    reader.readAsText(file);
-  });
-};
-
-const downloadJson = () => {
-  const dataJsonFormat = transformObjectToString(fileData);
-  console.log(dataJsonFormat);
-};
-
-watchEffect(() => {
-  type.value = inputRef.fileType;
-});
 </script>
 
 <template>
   <div class="container-fluid">
     <div class="card">
       <div class="card-body">
-        <div>
-          <div class="mb-3">
-            <label for="docNo" class="form-label">Document Number</label>
-            <input
-              v-model="docNo"
-              class="form-control"
-              type="text"
-              id="docNo"
-              name="docNo"
-              placeholder="Enter Document Number"
-            />
-          </div>
+        <div class="mb-3">
+          <label for="docNo" class="form-label">Document Number</label>
+          <input
+            v-model="docNo"
+            class="form-control"
+            type="text"
+            id="docNo"
+            placeholder="Enter Document Number"
+          />
         </div>
 
         <div class="mb-3">
-          <label for="formFile" class="form-label">Pilih file upload</label>
-
-          <select
-            v-model="inputRef.fileType"
-            class="form-select"
-            aria-label="File type"
-          >
-            <option selected value="JSON">JSON</option>
+          <label class="form-label">Select File Type</label>
+          <select v-model="fileType" class="form-select">
+            <option value="JSON">JSON</option>
             <option value="EXCEL">Excel</option>
           </select>
         </div>
 
-        <form @submit.prevent>
-          <div v-if="type === 'JSON'">
-            <label for="formFile" class="form-label">Upload Json</label>
-            <input
-              class="form-control"
-              type="file"
-              id="file-json"
-              accept=".json"
-              placeholder="Upload JSON"
-            />
-          </div>
-          <div v-else>
-            <label for="formFile" class="form-label">Upload Excel</label>
-            <input
-              class="form-control"
-              type="file"
-              id="file-excel"
-              accept=".xlsx, .xls, .xlsm"
-            />
-          </div>
+        <div class="mb-3">
+          <label class="form-label">Upload {{ fileType }} File</label>
+          <input
+            class="form-control"
+            type="file"
+            :accept="fileType === 'JSON' ? '.json' : '.xlsx, .xls, .xlsm'"
+            @change="handleFileChange"
+          />
+        </div>
 
-          <div v-if="errorMessage" class="alert alert-danger mt-3">
-            {{ errorMessage }}
-          </div>
+        <div v-if="errorMessage" class="alert alert-danger mt-3">
+          {{ errorMessage }}
+        </div>
 
-          <button
-            @click="onProses"
-            :disabled="isProses"
-            class="btn btn-primary mt-3"
-            id="download"
-          >
-            <div v-if="isProses" class="px-2 d-flex align-items-center gap-2">
-              <div
-                class="spinner-border spinner-border-sm text-white"
-                role="status"
-              ></div>
-              Processing...
-            </div>
-            <div v-if="!isProses" id="text-download">Proses</div>
-          </button>
-        </form>
+        <button
+          @click="processFile"
+          :disabled="isProses"
+          class="btn btn-primary mt-3"
+        >
+          <span v-if="isProses" class="d-flex align-items-center gap-2">
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+            Processing...
+          </span>
+          <span v-else>Process</span>
+        </button>
 
-        <!-- Display uploaded file info -->
         <div v-if="fileName" class="mt-3">
           <strong>File processed:</strong> {{ fileName }}
         </div>
 
-        <!-- Display Document Number -->
-        <div class="mt-3"><strong>Document Number: </strong> {{ docNo }}</div>
+        <div class="mt-3">
+          <strong>Document Number:</strong> {{ docNo || "Not specified" }}
+        </div>
 
-        <!-- Display data in table format -->
         <div v-if="fileData" class="mt-4">
-          <h5>File Data ({{ fileData.type.toUpperCase() }}):</h5>
+          <h5>File Data ({{ fileData.type.toUpperCase() }})</h5>
           <div class="table-responsive">
             <table class="table table-bordered">
               <thead>
@@ -292,19 +100,36 @@ watchEffect(() => {
           </div>
         </div>
 
-        <!-- Display raw JSON data for debugging -->
         <div v-if="fileData && fileData.type === 'json'" class="mt-3">
-          <h5>Raw JSON Data:</h5>
+          <h5>Raw JSON Data</h5>
           <pre class="bg-light p-3 rounded">{{
             JSON.stringify(fileData.data, null, 2)
           }}</pre>
         </div>
 
-        <!-- JSON Download Button -->
-        <div v-if="fileData" class="mt-4">
-          <button @click="downloadJson" class="btn btn-success">
+        <div v-if="fileData" class="mt-4 d-flex gap-2">
+          <button
+            @click="downloadJson"
+            class="btn btn-success"
+            :disabled="isProses"
+          >
             Download JSON
           </button>
+          <!--          <button-->
+          <!--            v-else-->
+          <!--            @click="downloadExcel"-->
+          <!--            class="btn btn-success"-->
+          <!--            :disabled="isProses"-->
+          <!--          >-->
+          <!--            <span v-if="isProses" class="d-flex align-items-center gap-2">-->
+          <!--              <span-->
+          <!--                class="spinner-border spinner-border-sm"-->
+          <!--                role="status"-->
+          <!--              ></span>-->
+          <!--              Generating...-->
+          <!--            </span>-->
+          <!--            <span v-else>Download Excel</span>-->
+          <!--          </button>-->
         </div>
       </div>
     </div>
@@ -312,6 +137,7 @@ watchEffect(() => {
 </template>
 
 <style scoped>
+/* Your existing styles remain the same */
 .table-responsive {
   max-height: 400px;
   overflow-y: auto;
@@ -321,5 +147,47 @@ pre {
   max-height: 300px;
   overflow-y: auto;
   white-space: pre-wrap;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.25rem;
+}
+
+.spinner-border {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: text-bottom;
+  border: 0.15em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
 }
 </style>

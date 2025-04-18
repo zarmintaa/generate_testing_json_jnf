@@ -11,8 +11,13 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("./components/PpdBaru.vue"),
+      component: () => import("./components/Home.vue"),
       name: "home",
+    },
+    {
+      path: "/ppd-baru",
+      component: () => import("./components/PpdBaru.vue"),
+      name: "ppd-baru",
     },
   ],
   history: createWebHistory(),

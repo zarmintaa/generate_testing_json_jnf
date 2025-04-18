@@ -4,7 +4,13 @@
   <div class="col-md-3">
     <div class="list-group gap-2">
       <RouterLink
-        to="#"
+        to="/"
+        class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
+        active-class="active_page"
+        >Manual Template</RouterLink
+      >
+      <RouterLink
+        to="ppd-baru"
         class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
         active-class="active_page"
         >PPD Baru</RouterLink
