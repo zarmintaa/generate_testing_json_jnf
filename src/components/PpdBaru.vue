@@ -111,7 +111,7 @@ const handleFileChange = (event) => {
           </div>
 
           <div v-if="fileData" class="mt-4">
-            <h5>File Data ({{ fileData.type.toUpperCase() }})</h5>
+            <h5>Result Upload Data ({{ fileData.type.toUpperCase() }})</h5>
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
