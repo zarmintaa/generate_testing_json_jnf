@@ -3,6 +3,8 @@ import { ref, watch } from "vue";
 import { useFileStore } from "../store/fileStore";
 import { storeToRefs } from "pinia";
 import Layout from "./Layout.vue";
+import PropertiesItem from "./blocks/PropertiesItem.vue";
+import Properties from "./blocks/Properties.vue";
 
 const { title } = defineProps({
   title: String,
@@ -96,7 +98,7 @@ watch(
 <template>
   <Layout>
     <div class="card">
-      <div class="card-header card-header-tabs">
+      <div class="card-header">
         <h5 class="text-black">{{ title }}</h5>
       </div>
       <div class="card-body">
@@ -155,33 +157,23 @@ watch(
           </div>
         </form>
 
-        <div class="card mt-4">
-          <div class="card-header">
-            <div>Setting Properties</div>
-          </div>
-          <div class="card-body">
-            <div class="mb-2">
-              <strong>Document Number:</strong>
-              <span :class="{ 'text-danger': docNoError }">
-                {{ docNo || "Not specified" }}
-              </span>
-            </div>
-
-            <div class="mb-2">
-              <strong>JSON Name:</strong>
-              <span :class="{ 'text-danger': jsonNameError }">
-                {{ jsonName || "Not specified" }}
-              </span>
-            </div>
-
-            <div class="mb-2">
-              <strong>Source System:</strong>
-              <span :class="{ 'text-danger': sourceSystemError }">
-                {{ sourceSystem || "Not specified" }}
-              </span>
-            </div>
-          </div>
-        </div>
+        <Properties>
+          <PropertiesItem
+            :input-properties="docNo"
+            input-label="Document Number"
+            input-properties-error="Not specified"
+          />
+          <PropertiesItem
+            :input-properties="jsonName"
+            input-label="JSON Name"
+            input-properties-error="Not specified"
+          />
+          <PropertiesItem
+            :input-properties="sourceSystem"
+            input-label="Source System"
+            input-properties-error="Not specified"
+          />
+        </Properties>
 
         <div v-if="templatePreview" class="mt-4">
           <div class="card">

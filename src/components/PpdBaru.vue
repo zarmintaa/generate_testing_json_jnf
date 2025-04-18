@@ -3,6 +3,8 @@ import { storeToRefs } from "pinia";
 import { useFileStore } from "../store/fileStore.js";
 import Layout from "./Layout.vue";
 import { ref, watch } from "vue";
+import PropertiesItem from "./blocks/PropertiesItem.vue";
+import Properties from "./blocks/Properties.vue";
 
 const fileStore = useFileStore();
 const { title } = defineProps({
@@ -66,24 +68,6 @@ const handleDocNoInput = (event) => {
         </div>
         <div class="card-body">
           <div class="mb-3">
-            <label for="docNo" class="form-label">Document Number</label>
-            <input
-              v-model="docNo"
-              class="form-control"
-              :class="{ 'is-invalid': docNoError }"
-              type="text"
-              id="docNo"
-              placeholder="Contoh: 020125R000582"
-              maxlength="12"
-              @input="handleDocNoInput"
-            />
-            <div v-if="docNoError" class="invalid-feedback">
-              {{ docNoError }}
-            </div>
-            <div class="small text-muted mt-1">Format: (12 karakter total)</div>
-          </div>
-
-          <div class="mb-3">
             <label class="form-label">Select File Type</label>
             <select v-model="fileType" class="form-select">
               <option value="JSON">JSON</option>
@@ -120,33 +104,33 @@ const handleDocNoInput = (event) => {
             <span v-else>Process</span>
           </button>
 
-          <div class="card mt-4">
+          <Properties>
+            <PropertiesItem
+              :input-properties="fileName"
+              input-label="File Name"
+              input-properties-error="File didn't process yet"
+            />
+            <PropertiesItem
+              :input-properties="docNo"
+              input-label="Document Number"
+              input-properties-error="Not specified"
+            />
+            <PropertiesItem
+              :input-properties="jsonName"
+              input-label="JSON Name"
+              input-properties-error="Not specified"
+            />
+            <PropertiesItem
+              :input-properties="sourceSystem"
+              input-label="Source System"
+              input-properties-error="Not specified"
+            />
+          </Properties>
+
+          <div v-if="fileData" class="card mt-4">
             <div class="card-header">
-              <div>Setting Properties</div>
+              Result Upload Data ({{ fileData.type.toUpperCase() }})
             </div>
-            <div class="card-body">
-              <div class="mb-2">
-                <strong>File processed:</strong>
-                {{ fileName || "File didn't process yet" }}
-              </div>
-
-              <div class="mb-2">
-                <strong>Document Number:</strong> {{ docNo || "Not specified" }}
-              </div>
-
-              <div class="mb-2">
-                <strong>JSON Name:</strong> {{ jsonName || "Not specified" }}
-              </div>
-
-              <div class="mb-2">
-                <strong>Source System:</strong>
-                {{ sourceSystem || "Not specified" }}
-              </div>
-            </div>
-          </div>
-
-          <div v-if="fileData" class="mt-4">
-            <h5>Result Upload Data ({{ fileData.type.toUpperCase() }})</h5>
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
@@ -170,11 +154,13 @@ const handleDocNoInput = (event) => {
             </div>
           </div>
 
-          <div v-if="fileData && fileData.type === 'json'" class="mt-3">
-            <h5>Raw JSON Data</h5>
-            <pre class="bg-light p-3 rounded">{{
-              JSON.stringify(fileData.data, null, 2)
-            }}</pre>
+          <div v-if="fileData && fileData.type === 'json'" class="card mt-3">
+            <div class="card">
+              <div class="card-header">Raw JSON Data</div>
+              <pre class="bg-light p-3 rounded">{{
+                JSON.stringify(fileData.data, null, 2)
+              }}</pre>
+            </div>
           </div>
 
           <div v-if="fileData" class="mt-4 d-flex gap-2">
