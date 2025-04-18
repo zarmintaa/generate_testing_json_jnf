@@ -148,7 +148,7 @@ const handleFileChange = (event) => {
               class="btn btn-success"
               :disabled="isProses"
             >
-              Download JSON
+              Download JSON Template
             </button>
             <!--          <button-->
             <!--            v-else-->
