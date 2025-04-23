@@ -43,13 +43,26 @@ export const useFileStore = defineStore("file", {
 
   getters: {
     type: (state) => state.fileType,
-    currentTemplate: (state) => state.uploadedTemplate || state.template,
+    currentTemplate: (state) => state.template,
     formattedData: (state) => {
       if (!state.fileData?.data) return { data: [] };
 
-      const currentTemplate = JSON.parse(JSON.stringify(state.currentTemplate));
-      currentTemplate.data[0].msgContent = state.fileData.data;
-      return currentTemplate;
+      const result = state.fileData.data;
+      result.map((data) => JSON.stringify({ data }));
+      const currentTemplate = state.currentTemplate;
+      currentTemplate.data[0].msgContent = result;
+
+      return {
+        data: [
+          {
+            fastSeqNo: "1",
+            msgContent: [result.map((data) => JSON.stringify({ data }))],
+            jsonName: "MASTER",
+            sourceSystem: "AMAN",
+            senderDocNo: generateDocNo(),
+          },
+        ],
+      };
     },
   },
 
@@ -121,7 +134,6 @@ export const useFileStore = defineStore("file", {
       dataArray.forEach((item) => {
         Object.keys(item).forEach((key) => headers.add(key));
       });
-
       this.fileData = {
         type: this.type.toLowerCase(),
         data: dataArray,
