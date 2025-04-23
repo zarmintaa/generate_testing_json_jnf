@@ -17,7 +17,7 @@ function generateDocNo() {
 
 export const useFileStore = defineStore("file", {
   state: () => ({
-    fileType: "JSON",
+    fileType: "EXCEL",
     docNo: generateDocNo(),
     isProses: false,
     fileData: null,
