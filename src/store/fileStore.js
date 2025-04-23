@@ -56,7 +56,7 @@ export const useFileStore = defineStore("file", {
         data: [
           {
             fastSeqNo: "1",
-            msgContent: [result.map((data) => JSON.stringify({ data }))],
+            msgContent: result.map((data) => JSON.stringify({ data })),
             jsonName: "MASTER",
             sourceSystem: "AMAN",
             senderDocNo: generateDocNo(),
