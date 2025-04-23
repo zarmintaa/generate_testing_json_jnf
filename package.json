@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "convert-json-njf-ui": "file:",
     "exceljs": "^4.4.0",
     "pinia": "^3.0.1",
     "tailwindcss": "^4.1.4",

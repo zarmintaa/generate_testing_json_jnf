@@ -10,7 +10,7 @@ function generateDocNo() {
   const year = String(now.getFullYear()).slice(-2);
   const randomNum = String(Math.floor(Math.random() * 999999) + 1).padStart(
     6,
-    "0",
+    "0"
   );
   return `${day}${month}${year}R${randomNum}`;
 }
@@ -152,7 +152,11 @@ export const useFileStore = defineStore("file", {
 
               const rowData = {};
               row.eachCell((cell, colNumber) => {
-                rowData[headers[colNumber - 1]] = cell.value;
+                let resultReadRow = cell.value;
+                if (resultReadRow === "NULL") {
+                  resultReadRow = null;
+                }
+                rowData[headers[colNumber - 1]] = resultReadRow;
               });
               data.push(rowData);
             });
@@ -194,7 +198,9 @@ export const useFileStore = defineStore("file", {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo}.json`;
+      a.download = `export_${new Date().toISOString().slice(0, 10)}_${
+        this.docNo
+      }.json`;
       a.click();
       URL.revokeObjectURL(url);
     },
@@ -273,7 +279,9 @@ export const useFileStore = defineStore("file", {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `export_${new Date().toISOString().slice(0, 10)}_${this.docNo}.xlsx`;
+        a.download = `export_${new Date().toISOString().slice(0, 10)}_${
+          this.docNo
+        }.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
       } catch (error) {

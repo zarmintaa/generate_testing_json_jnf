@@ -22,7 +22,7 @@ const router = createRouter({
       component: () => import("./components/PpdBaru.vue"),
       name: "ppd-baru",
       props: {
-        title: "PPD Baru",
+        title: "Generate JSON",
       },
     },
   ],

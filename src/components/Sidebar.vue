@@ -13,7 +13,7 @@
         :to="{ name: 'ppd-baru' }"
         class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
         active-class="active_page"
-        >PPD Baru</RouterLink
+        >Generate JSON</RouterLink
       >
       <!--      <RouterLink
         to="#"
