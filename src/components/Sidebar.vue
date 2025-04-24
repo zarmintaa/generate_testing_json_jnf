@@ -15,11 +15,6 @@
         active-class="active_page"
         >Generate JSON</RouterLink
       >
-      <!--      <RouterLink
-        to="#"
-        class="p-3 bg-white border list-group-item list-group-item-action text-decoration-none"
-        >Angsuran</RouterLink
-      >-->
     </div>
   </div>
 </template>

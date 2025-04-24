@@ -55,11 +55,11 @@ export const useFileStore = defineStore("file", {
       return {
         data: [
           {
-            fastSeqNo: "1",
+            fastSeqNo: state.template.data[0].fastSeqNo,
             msgContent: result.map((data) => JSON.stringify({ data })),
-            jsonName: "MASTER",
-            sourceSystem: "AMAN",
-            senderDocNo: generateDocNo(),
+            jsonName: state.template.data[0].jsonName,
+            sourceSystem: state.template.data[0].sourceSystem,
+            senderDocNo: state.docNo,
           },
         ],
       };
