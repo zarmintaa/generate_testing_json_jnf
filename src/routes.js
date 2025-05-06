@@ -9,7 +9,7 @@ export const routes = {
         {
           path: "",
           components: {
-            default: () => import("./components/PpdBaru.vue"),
+            default: () => import("./pages/PpdBaru.vue"),
             sidebar: () => import("./components/Sidebar.vue"),
           },
           name: "home",

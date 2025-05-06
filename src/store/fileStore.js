@@ -10,7 +10,7 @@ function generateDocNo() {
   const year = String(now.getFullYear()).slice(-2);
   const randomNum = String(Math.floor(Math.random() * 999999) + 1).padStart(
     6,
-    "0"
+    "0",
   );
   return `${day}${month}${year}R${randomNum}`;
 }
@@ -199,6 +199,13 @@ export const useFileStore = defineStore("file", {
         reader.onerror = reject;
         reader.readAsText(file);
       });
+    },
+
+    previewJson() {
+      if (!this.fileData) return;
+
+      console.log(this.formattedData);
+      return JSON.stringify(this.formattedData, null, 2);
     },
 
     downloadJson() {

@@ -1,10 +1,10 @@
 <script setup>
 import { ref, watch } from "vue";
-import { useFileStore } from "../store/fileStore";
+import { useFileStore } from "../store/fileStore.js";
 import { storeToRefs } from "pinia";
-import Layout from "./Layout.vue";
-import PropertiesItem from "./blocks/PropertiesItem.vue";
-import Properties from "./blocks/Properties.vue";
+import Layout from "../components/Layout.vue";
+import PropertiesItem from "../components/blocks/PropertiesItem.vue";
+import Properties from "../components/blocks/Properties.vue";
 
 const { title } = defineProps({
   title: String,
@@ -91,7 +91,7 @@ watch(
   {
     immediate: true,
     deep: true,
-  }
+  },
 );
 </script>
 

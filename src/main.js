@@ -3,7 +3,7 @@ import { createPinia } from "pinia";
 import "./style.css";
 import App from "./App.vue";
 import { createRouter, createWebHistory } from "vue-router";
-import PpdBaru from "./components/PpdBaru.vue";
+import PpdBaru from "./pages/PpdBaru.vue";
 import Layout from "./components/Layout.vue";
 
 const pinia = createPinia();
@@ -11,7 +11,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("./components/Home.vue"),
+      component: () => import("./pages/Home.vue"),
       name: "setting-template",
       props: {
         title: "Setting Template",
@@ -19,7 +19,7 @@ const router = createRouter({
     },
     {
       path: "/ppd-baru",
-      component: () => import("./components/PpdBaru.vue"),
+      component: () => import("./pages/PpdBaru.vue"),
       name: "ppd-baru",
       props: {
         title: "Generate JSON",

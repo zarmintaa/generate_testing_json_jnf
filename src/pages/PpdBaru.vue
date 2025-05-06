@@ -1,10 +1,10 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { useFileStore } from "../store/fileStore.js";
-import Layout from "./Layout.vue";
+import Layout from "../components/Layout.vue";
 import { ref, watch } from "vue";
-import PropertiesItem from "./blocks/PropertiesItem.vue";
-import Properties from "./blocks/Properties.vue";
+import PropertiesItem from "../components/blocks/PropertiesItem.vue";
+import Properties from "../components/blocks/Properties.vue";
 
 const fileStore = useFileStore();
 const { title } = defineProps({
@@ -25,7 +25,7 @@ const {
   sourceSystem,
 } = storeToRefs(fileStore);
 
-const { processFile, downloadJson, downloadExcel } = fileStore;
+const { processFile, downloadJson, previewJson, downloadExcel } = fileStore;
 
 // State untuk validasi
 const docNoError = ref("");
@@ -56,6 +56,14 @@ const handleDocNoInput = (event) => {
   if (event.target.value.length >= 12 && event.data) {
     event.preventDefault();
   }
+};
+
+const previewJsonTemplate = ref(null);
+const isPreviewJsonTemplate = ref(false);
+
+const handlePreviewJsonTemplate = () => {
+  previewJsonTemplate.value = previewJson();
+  isPreviewJsonTemplate.value = !isPreviewJsonTemplate.value;
 };
 </script>
 
@@ -163,14 +171,51 @@ const handleDocNoInput = (event) => {
             </div>
           </div>
 
-          <div v-if="fileData" class="mt-4 d-flex gap-2">
-            <button
-              @click="downloadJson"
-              class="btn btn-success"
-              :disabled="isProses"
-            >
-              Download JSON Template
-            </button>
+          <div v-if="fileData" class="d-flex gap-4">
+            <div class="mt-4 d-flex gap-2">
+              <button
+                @click="downloadJson"
+                class="btn btn-success"
+                :disabled="isProses"
+              >
+                Download JSON Template
+              </button>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+              <button
+                @click="handlePreviewJsonTemplate"
+                class="btn btn-primary"
+                :disabled="isProses"
+              >
+                Preview JSON Template
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-if="isPreviewJsonTemplate"
+            class="modal-overlay"
+            @click="isPreviewJsonTemplate = false"
+          >
+            <div class="modal-dialog" @click.stop>
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Preview JSON Data</h5>
+                  <button
+                    class="btn btn-primary"
+                    @click="isPreviewJsonTemplate = false"
+                  >
+                    <span class="fw-bold">Close</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <pre class="bg-light p-3 rounded">{{
+                    previewJsonTemplate
+                  }}</pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -179,14 +224,64 @@ const handleDocNoInput = (event) => {
 </template>
 
 <style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.modal-dialog {
+  width: 90%;
+  //max-width: 1500px;
+  margin: 1.75rem auto;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fff;
+  border-radius: 0.3rem;
+  outline: 0;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-body {
+  padding: 1rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.btn-close {
+  padding: 0.5rem;
+  margin: -0.5rem -0.5rem -0.5rem auto;
+  background: transparent;
+  border: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
 .table-responsive {
   max-height: 400px;
   overflow-y: auto;
 }
 
 pre {
-  max-height: 300px;
-  overflow-y: auto;
+  max-height: 600px;
+  overflow: auto;
+  width: 100%;
   white-space: pre-wrap;
   background-color: #f8f9fa;
   padding: 1rem;
