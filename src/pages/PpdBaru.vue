@@ -60,10 +60,26 @@ const handleDocNoInput = (event) => {
 
 const previewJsonTemplate = ref(null);
 const isPreviewJsonTemplate = ref(false);
+const copyStatus = ref("");
 
 const handlePreviewJsonTemplate = () => {
   previewJsonTemplate.value = previewJson();
   isPreviewJsonTemplate.value = !isPreviewJsonTemplate.value;
+};
+
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(previewJsonTemplate.value);
+    copyStatus.value = "Copied!";
+    setTimeout(() => {
+      copyStatus.value = "";
+    }, 2000);
+  } catch (err) {
+    copyStatus.value = "Failed to copy";
+    setTimeout(() => {
+      copyStatus.value = "";
+    }, 2000);
+  }
 };
 </script>
 
@@ -202,12 +218,61 @@ const handlePreviewJsonTemplate = () => {
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title">Preview JSON Data</h5>
-                  <button
-                    class="btn btn-primary"
-                    @click="isPreviewJsonTemplate = false"
-                  >
-                    <span class="fw-bold">Close</span>
-                  </button>
+
+                  <div class="d-flex gap-2 align-items-center">
+                    <span v-show="copyStatus" class="text-success">{{
+                      copyStatus
+                    }}</span>
+                    <button class="btn btn-secondary" @click="copyToClipboard">
+                      <span class="fw-bold"
+                        ><svg
+                          class="w-6 h-6 text-gray-800 dark:text-white"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
+                            clip-rule="evenodd"
+                          />
+                          <path
+                            fill-rule="evenodd"
+                            d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                        Copy</span
+                      >
+                    </button>
+                    <button
+                      class="btn btn-primary"
+                      @click="isPreviewJsonTemplate = false"
+                    >
+                      <span class="fw-bold"
+                        ><svg
+                          class="w-6 h-6 text-gray-800 dark:text-white"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18 17.94 6M18 18 6.06 6"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                  </div>
                 </div>
                 <div class="modal-body">
                   <pre class="bg-light p-3 rounded">{{
