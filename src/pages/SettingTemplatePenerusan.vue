@@ -103,7 +103,7 @@ onMounted(() => {
             </div>
           </div>
           <div class="mb-3">
-            <label for="user nik">User NIK</label>
+            <label for="user nik" class="form-label">User NIK</label>
             <input
               type="text"
               v-model="localUserNik"
