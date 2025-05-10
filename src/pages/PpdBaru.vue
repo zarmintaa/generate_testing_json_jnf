@@ -29,19 +29,7 @@ const {
 
 const { processFile, downloadJson, previewJson, downloadExcel } = fileStore;
 
-// State untuk validasi
-const docNoError = ref("");
-
-// Watch perubahan pada docNo
-watch(docNo, (newValue) => {
-  if (newValue.length > 12) {
-    docNoError.value = "Document Number tidak boleh lebih dari 12 karakter";
-    // Potong ke 12 karakter
-    docNo.value = newValue.slice(0, 12);
-  } else {
-    docNoError.value = "";
-  }
-});
+const isFileNotReady = ref(true);
 
 // Handle file input changes
 const handleFileChange = (event) => {
@@ -51,13 +39,7 @@ const handleFileChange = (event) => {
   } else {
     fileStore.excelFileInput = file;
   }
-};
-
-// Handle input untuk mencegah lebih dari 12 karakter
-const handleDocNoInput = (event) => {
-  if (event.target.value.length >= 12 && event.data) {
-    event.preventDefault();
-  }
+  isFileNotReady.value = !isFileNotReady.value;
 };
 
 const previewJsonTemplate = ref(null);
@@ -91,6 +73,7 @@ const fileProsesUpload = async () => {
       templateStore.setData(fileData.value.data, "disburse");
     }
   });
+  isFileNotReady.value = !isFileNotReady.value;
 };
 </script>
 
@@ -105,7 +88,6 @@ const fileProsesUpload = async () => {
           <div class="mb-3">
             <label class="form-label">Select File Type</label>
             <select v-model="fileType" class="form-select">
-              <!-- <option value="JSON">JSON</option> -->
               <option value="EXCEL">Excel</option>
             </select>
           </div>
@@ -126,7 +108,7 @@ const fileProsesUpload = async () => {
 
           <button
             @click="fileProsesUpload"
-            :disabled="isProses"
+            :disabled="isFileNotReady"
             class="btn btn-primary mt-3"
           >
             <span v-if="isProses" class="d-flex align-items-center gap-2">

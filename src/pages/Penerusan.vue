@@ -86,7 +86,6 @@ const fileProsesUpload = async () => {
           <div class="mb-3">
             <label class="form-label">Select File Type</label>
             <select v-model="fileType" class="form-select">
-              <!-- <option value="JSON">JSON</option> -->
               <option value="EXCEL">Excel</option>
             </select>
           </div>
