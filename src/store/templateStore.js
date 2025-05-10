@@ -70,6 +70,14 @@ export const useTemplateStore = defineStore("templateStore", {
       };
     },
 
+    setDocNoApp() {
+      this.data.forEach((item) => {
+        if (item.AIT_DOC_NO_APP) {
+          this.docNoApp = item.AIT_DOC_NO_APP;
+        }
+      });
+    },
+
     setData(data, type = "disburse") {
       if (type === "disburse") {
         if (!data) this.data = [];
@@ -79,6 +87,7 @@ export const useTemplateStore = defineStore("templateStore", {
       this.data = data.map((record) => record);
       this.setJumlahRow();
       this.setJumlahAmount();
+      this.setDocNoApp();
     },
 
     setJumlahRow() {
