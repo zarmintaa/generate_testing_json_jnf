@@ -11,10 +11,22 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      component: () => import("./pages/Home.vue"),
-      name: "setting-template",
+      redirect: "/setting-template-disburse",
+    },
+    {
+      path: "/setting-template-disburse",
+      component: () => import("./pages/SettingTemplateDisburse.vue"),
+      name: "setting-template-disburse",
       props: {
-        title: "Setting Template",
+        title: "Setting Template Disburse",
+      },
+    },
+    {
+      path: "/setting-template-penerusan",
+      component: () => import("./pages/SettingTemplatePenerusan.vue"),
+      name: "setting-template-penerusan",
+      props: {
+        title: "Setting Template Penerusan",
       },
     },
     {
@@ -22,7 +34,15 @@ const router = createRouter({
       component: () => import("./pages/PpdBaru.vue"),
       name: "ppd-baru",
       props: {
-        title: "Generate JSON",
+        title: "PPD Baru",
+      },
+    },
+    {
+      path: "/penerusan",
+      component: () => import("./pages/Penerusan.vue"),
+      name: "penerusan",
+      props: {
+        title: "Penerusan",
       },
     },
   ],

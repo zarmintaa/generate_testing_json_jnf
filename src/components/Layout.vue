@@ -1,8 +1,6 @@
 <script setup>
 import Sidebar from "./Sidebar.vue";
 import Content from "./Content.vue";
-
-console.log("Home");
 </script>
 
 <template>

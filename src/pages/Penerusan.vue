@@ -1,11 +1,11 @@
 <script setup>
-import { storeToRefs } from "pinia";
-import { useFileStore } from "../store/fileStore.js";
 import Layout from "../components/Layout.vue";
-import { ref, watch } from "vue";
+import { useFileStore } from "../store/fileStore.js";
+import { useTemplateStore } from "../store/templateStore.js";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
-import { useTemplateStore } from "../store/templateStore.js";
 
 const fileStore = useFileStore();
 const templateStore = useTemplateStore();
@@ -21,27 +21,18 @@ const {
   fileData,
   errorMessage,
   fileName,
-  type,
-  template,
   jsonName,
   sourceSystem,
 } = storeToRefs(fileStore);
+const { docNoApp, userNik, data } = storeToRefs(templateStore);
 
 const { processFile, downloadJson, previewJson, downloadExcel } = fileStore;
 
-// State untuk validasi
-const docNoError = ref("");
+const isFileNotReady = ref(true);
 
-// Watch perubahan pada docNo
-watch(docNo, (newValue) => {
-  if (newValue.length > 12) {
-    docNoError.value = "Document Number tidak boleh lebih dari 12 karakter";
-    // Potong ke 12 karakter
-    docNo.value = newValue.slice(0, 12);
-  } else {
-    docNoError.value = "";
-  }
-});
+const previewJsonTemplate = ref(null);
+const isPreviewJsonTemplate = ref(false);
+const copyStatus = ref("");
 
 // Handle file input changes
 const handleFileChange = (event) => {
@@ -51,22 +42,11 @@ const handleFileChange = (event) => {
   } else {
     fileStore.excelFileInput = file;
   }
+  isFileNotReady.value = !isFileNotReady.value;
 };
-
-// Handle input untuk mencegah lebih dari 12 karakter
-const handleDocNoInput = (event) => {
-  if (event.target.value.length >= 12 && event.data) {
-    event.preventDefault();
-  }
-};
-
-const previewJsonTemplate = ref(null);
-const isPreviewJsonTemplate = ref(false);
-const copyStatus = ref("");
 
 const handlePreviewJsonTemplate = () => {
-  // previewJsonTemplate.value = previewJson();
-  previewJsonTemplate.value = templateStore.getDisburseRequest();
+  previewJsonTemplate.value = templateStore.getPenerusanRequest();
   isPreviewJsonTemplate.value = !isPreviewJsonTemplate.value;
 };
 
@@ -88,9 +68,10 @@ const copyToClipboard = async () => {
 const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
-      templateStore.setData(fileData.value.data, "disburse");
+      templateStore.setData(fileData.value.data, "penerusan");
     }
   });
+  isFileNotReady.value = !isFileNotReady.value;
 };
 </script>
 
@@ -126,7 +107,7 @@ const fileProsesUpload = async () => {
 
           <button
             @click="fileProsesUpload"
-            :disabled="isProses"
+            :disabled="isFileNotReady"
             class="btn btn-primary mt-3"
           >
             <span v-if="isProses" class="d-flex align-items-center gap-2">
@@ -146,18 +127,13 @@ const fileProsesUpload = async () => {
               input-properties-error="File didn't process yet"
             />
             <PropertiesItem
-              :input-properties="docNo"
+              :input-properties="docNoApp"
               input-label="Document Number"
               input-properties-error="Not specified"
             />
             <PropertiesItem
-              :input-properties="jsonName"
+              :input-properties="userNik"
               input-label="JSON Name"
-              input-properties-error="Not specified"
-            />
-            <PropertiesItem
-              :input-properties="sourceSystem"
-              input-label="Source System"
               input-properties-error="Not specified"
             />
           </Properties>

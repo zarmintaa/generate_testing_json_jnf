@@ -140,7 +140,6 @@ const downloadJson = () => {
   if (!fileData.value) return;
 
   const dataJsonFormat = transformObjectToString(fileData);
-  console.log("Data to download:", dataJsonFormat);
 
   const blob = new Blob([JSON.stringify(dataJsonFormat, null, 2)], {
     type: "application/json",

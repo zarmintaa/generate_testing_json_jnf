@@ -204,7 +204,6 @@ export const useFileStore = defineStore("file", {
     previewJson() {
       if (!this.fileData) return;
 
-      console.log(this.formattedData);
       return JSON.stringify(this.formattedData, null, 2);
     },
 

@@ -5,41 +5,29 @@ import { storeToRefs } from "pinia";
 import Layout from "../components/Layout.vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
+import { useTemplateStore } from "../store/templateStore.js";
 
 const { title } = defineProps({
   title: String,
 });
-const fileStore = useFileStore();
-const { docNo, jsonName, sourceSystem } = storeToRefs(fileStore);
+const templateStore = useTemplateStore();
+const { jsonName, sourceSystem, senderDocNo } = storeToRefs(templateStore);
+
+// const { senderDocNo, jsonName, sourceSystem } = storeToRefs(fileStore);
 const templatePreview = ref(null);
-const uploadError = ref(null);
 
 // Validation states
 const docNoError = ref("");
 const jsonNameError = ref("");
 const sourceSystemError = ref("");
 
-const handleFileChange = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    uploadError.value = null;
-    await fileStore.setNewTemplate(file);
-    updateTemplatePreview();
-  } catch (error) {
-    console.error("Template upload failed:", error);
-    uploadError.value = error.message || "Invalid template file";
-  }
-};
-
 const validateDocNo = () => {
-  if (docNo.value.length > 12) {
+  if (senderDocNo.value.length > 12) {
     docNoError.value = "Document Number cannot exceed 12 characters";
-    docNo.value = docNo.value.slice(0, 12);
+    senderDocNo.value = senderDocNo.value.slice(0, 12);
     return false;
   }
-  if (!docNo.value) {
+  if (!senderDocNo.value) {
     docNoError.value = "Document Number is required";
     return false;
   }
@@ -67,8 +55,8 @@ const validateSourceSystem = () => {
 
 const updateTemplatePreview = () => {
   if (validateDocNo() && validateJsonName() && validateSourceSystem()) {
-    templatePreview.value = fileStore.setJsonTemplateProperties({
-      docNo: docNo.value,
+    templatePreview.value = templateStore.setTemplateDisburse({
+      senderDocNo: senderDocNo.value,
       jsonName: jsonName.value,
       sourceSystem: sourceSystem.value,
     });
@@ -84,7 +72,7 @@ const handleDocNoInput = (event) => {
 };
 
 watch(
-  [docNo, jsonName, sourceSystem],
+  [senderDocNo, jsonName, sourceSystem],
   () => {
     updateTemplatePreview();
   },
@@ -104,17 +92,17 @@ watch(
       <div class="card-body">
         <form @submit.prevent>
           <div class="mb-3">
-            <label for="docNo" class="form-label">Document Number</label>
+            <label class="form-label" for="senderDocNo">Document Number</label>
             <input
-              v-model="docNo"
-              class="form-control"
+              id="senderDocNo"
+              v-model="senderDocNo"
               :class="{ 'is-invalid': docNoError }"
-              type="text"
-              id="docNo"
-              placeholder="Format: DDMMYYR###### (12 characters)"
+              class="form-control"
               maxlength="12"
-              @input="handleDocNoInput"
+              placeholder="Format: DDMMYYR###### (12 characters)"
+              type="text"
               @blur="validateDocNo"
+              @input="handleDocNoInput"
             />
             <div v-if="docNoError" class="invalid-feedback">
               {{ docNoError }}
@@ -125,14 +113,14 @@ watch(
           </div>
 
           <div class="mb-3">
-            <label for="jsonName" class="form-label">JSON Name</label>
+            <label class="form-label" for="jsonName">JSON Name</label>
             <input
-              v-model="jsonName"
-              class="form-control"
-              :class="{ 'is-invalid': jsonNameError }"
-              type="text"
               id="jsonName"
+              v-model="jsonName"
+              :class="{ 'is-invalid': jsonNameError }"
+              class="form-control"
               placeholder="Enter JSON Name"
+              type="text"
               @blur="validateJsonName"
             />
             <div v-if="jsonNameError" class="invalid-feedback">
@@ -141,14 +129,14 @@ watch(
           </div>
 
           <div class="mb-3">
-            <label for="sourceSystem" class="form-label">Source System</label>
+            <label class="form-label" for="sourceSystem">Source System</label>
             <input
-              v-model="sourceSystem"
-              class="form-control"
-              :class="{ 'is-invalid': sourceSystemError }"
-              type="text"
               id="sourceSystem"
+              v-model="sourceSystem"
+              :class="{ 'is-invalid': sourceSystemError }"
+              class="form-control"
               placeholder="Enter Source System"
+              type="text"
               @blur="validateSourceSystem"
             />
             <div v-if="sourceSystemError" class="invalid-feedback">
@@ -159,7 +147,7 @@ watch(
 
         <Properties>
           <PropertiesItem
-            :input-properties="docNo"
+            :input-properties="senderDocNo"
             input-label="Document Number"
             input-properties-error="Not specified"
           />
