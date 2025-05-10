@@ -34,34 +34,39 @@ export const useTemplateStore = defineStore("templateStore", {
   getters: {},
   actions: {
     setTemplatePenerusan({ docNoApp, userNik }) {
+      this.docNoApp = docNoApp;
+      this.userNik = userNik;
+      return this.generateTemplatePenerusan();
+    },
+
+    setTemplateDisburse({ jsonName, sourceSystem, senderDocNo }) {
+      this.jsonName = jsonName;
+      this.sourceSystem = sourceSystem;
+      this.senderDocNo = senderDocNo;
+      return this.generateTemplateDisburse();
+    },
+
+    generateTemplatePenerusan() {
       return {
-        docNoApp: docNoApp || this.docNoApp,
-        jumlahRow: this.jumlahRow,
-        jumlahAmount: this.jumlahAmount,
-        userNik: userNik || this.userNik,
+        docNoApp: this.docNoApp,
+        jumlahRow: 0,
+        jumlahAmount: 0,
+        userNik: this.userNik,
         data: [],
       };
     },
-    setTemplateDisburse({ jsonName, sourceSystem, senderDocNo }) {
+
+    generateTemplateDisburse() {
       return {
         data: [
           {
             fastSeqNo: this.fastSeqNo,
             msgContent: [],
-            jsonName: jsonName || this.jsonName,
-            sourceSystem: sourceSystem || this.sourceSystem,
-            senderDocNo: senderDocNo || this.senderDocNo,
+            jsonName: this.jsonName,
+            sourceSystem: this.sourceSystem,
+            senderDocNo: this.senderDocNo,
           },
         ],
-      };
-    },
-    generateTemplatePenerusan() {
-      return {
-        docNoApp: this.docNoApp,
-        jumlahRow: this.jumlahRow,
-        jumlahAmount: this.jumlahAmount,
-        userNik: this.userNik,
-        data: this.data,
       };
     },
 
