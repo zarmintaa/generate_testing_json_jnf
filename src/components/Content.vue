@@ -1,6 +1,4 @@
-<script setup>
-import Form from "./Form.vue";
-</script>
+<script setup></script>
 
 <template>
   <div class="col-md-9">

@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch } from "vue";
-import { useFileStore } from "../store/fileStore.js";
 import { storeToRefs } from "pinia";
 import Layout from "../components/Layout.vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";

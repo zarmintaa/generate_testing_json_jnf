@@ -1,6 +1,4 @@
-<script setup>
-import Layout from "./components/Layout.vue";
-</script>
+<script setup></script>
 
 <template>
   <RouterView />

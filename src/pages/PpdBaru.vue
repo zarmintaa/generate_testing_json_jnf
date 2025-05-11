@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useFileStore } from "../store/fileStore.js";
 import Layout from "../components/Layout.vue";
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
 import { useTemplateStore } from "../store/templateStore.js";
