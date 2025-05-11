@@ -123,12 +123,12 @@ const fileProsesUpload = async () => {
           />
           <PropertiesItem
             :input-properties="docNoApp"
-            input-label="Document Number"
+            input-label="Doc No App"
             input-properties-error="Not specified"
           />
           <PropertiesItem
             :input-properties="userNik"
-            input-label="JSON Name"
+            input-label="User NIK"
             input-properties-error="Not specified"
           />
         </Properties>

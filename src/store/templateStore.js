@@ -19,12 +19,14 @@ function generateDocNoApp(prefix = "J") {
   return year + prefix + paddedNum;
 }
 
+const userNik = "1000082742";
+
 export const useTemplateStore = defineStore("templateStore", {
   state: () => ({
     docNoApp: generateDocNoApp(),
     jumlahRow: 0,
     jumlahAmout: 0,
-    userNik: "1000082742",
+    userNik: userNik,
     data: [],
     fastSeqNo: "1",
     jsonName: "MASTER",
@@ -76,6 +78,10 @@ export const useTemplateStore = defineStore("templateStore", {
           this.docNoApp = item.AIT_DOC_NO_APP;
         }
       });
+
+      if (!this.docNoApp || this.docNoApp.value.length === 0) {
+        this.docNoApp = generateDocNoApp();
+      }
     },
 
     setData(data, type = "disburse") {
