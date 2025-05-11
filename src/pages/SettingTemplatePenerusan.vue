@@ -2,7 +2,7 @@
 import Layout from "../components/Layout.vue";
 import { useTemplateStore } from "../store/templateStore.js";
 import { storeToRefs } from "pinia";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
 
@@ -70,6 +70,10 @@ const handleDocNoInput = (event) => {
 watch([localDocNoApp, localUserNik], () => {
   updateTemplatePreview();
 });
+
+onMounted(() => {
+  templatePreview.value = templateStore.generateTemplatePenerusan();
+});
 </script>
 
 <template>
@@ -128,10 +132,10 @@ watch([localDocNoApp, localUserNik], () => {
           />
         </Properties>
 
-        <div v-if="templatePreview" class="mt-4">
+        <div class="mt-4">
           <div class="card">
             <div class="card-header">Template JSON Structure</div>
-            <div class="card-body">
+            <div class="card-body p-0">
               <pre class="bg-light p-3 rounded">{{
                 JSON.stringify(templatePreview, null, 2)
               }}</pre>
@@ -143,4 +147,47 @@ watch([localDocNoApp, localUserNik], () => {
   </Layout>
 </template>
 
-<style scoped></style>
+<style scoped>
+.card-header-tabs {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  padding: 0.75rem 1.25rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.rounded {
+  border-radius: 0.25rem !important;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin-bottom: 0;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545;
+}
+
+.small {
+  font-size: 0.875em;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+</style>

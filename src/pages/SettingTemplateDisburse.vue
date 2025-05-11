@@ -166,7 +166,7 @@ watch(
         <div v-if="templatePreview" class="mt-4">
           <div class="card">
             <div class="card-header">Template JSON Structure</div>
-            <div class="card-body">
+            <div class="card-body p-0">
               <pre class="bg-light p-3 rounded">{{
                 JSON.stringify(templatePreview, null, 2)
               }}</pre>
