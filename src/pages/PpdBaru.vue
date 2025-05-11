@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useFileStore } from "../store/fileStore.js";
 import Layout from "../components/Layout.vue";
-import { ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
 import { useTemplateStore } from "../store/templateStore.js";
@@ -13,21 +13,13 @@ const { title } = defineProps({
   title: String,
 });
 
-// Extract state and actions from the store
-const {
-  fileType,
-  docNo,
-  isProses,
-  fileData,
-  errorMessage,
-  fileName,
-  type,
-  template,
-  jsonName,
-  sourceSystem,
-} = storeToRefs(fileStore);
+const { senderDocNo, jsonName, sourceSystem } = storeToRefs(templateStore);
 
-const { processFile, downloadJson, previewJson, downloadExcel } = fileStore;
+// Extract state and actions from the store
+const { fileType, docNo, isProses, fileData, errorMessage, fileName } =
+  storeToRefs(fileStore);
+
+const { processFile, downloadJson } = fileStore;
 
 const isFileNotReady = ref(true);
 
@@ -47,7 +39,6 @@ const isPreviewJsonTemplate = ref(false);
 const copyStatus = ref("");
 
 const handlePreviewJsonTemplate = () => {
-  // previewJsonTemplate.value = previewJson();
   previewJsonTemplate.value = templateStore.getDisburseRequest();
   isPreviewJsonTemplate.value = !isPreviewJsonTemplate.value;
 };
@@ -128,7 +119,7 @@ const fileProsesUpload = async () => {
               input-properties-error="File didn't process yet"
             />
             <PropertiesItem
-              :input-properties="docNo"
+              :input-properties="senderDocNo"
               input-label="Document Number"
               input-properties-error="Not specified"
             />
@@ -336,9 +327,8 @@ const fileProsesUpload = async () => {
 }
 
 pre {
-  max-height: 600px;
-  overflow: auto;
   white-space: pre-wrap;
+  overflow: auto;
   background-color: #f8f9fa;
   padding: 1rem;
   border-radius: 0.25rem;

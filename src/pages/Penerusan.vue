@@ -329,9 +329,8 @@ const fileProsesUpload = async () => {
 }
 
 pre {
-  max-height: 600px;
-  overflow: auto;
   white-space: pre-wrap;
+  overflow: auto;
   background-color: #f8f9fa;
   padding: 1rem;
   border-radius: 0.25rem;
