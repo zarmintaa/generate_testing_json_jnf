@@ -77,194 +77,186 @@ const fileProsesUpload = async () => {
 
 <template>
   <Layout>
-    <div class="container-fluid">
-      <div class="card">
-        <div class="card-header card-header-tabs">
-          <h5 class="text-black">{{ title }}</h5>
+    <div class="card">
+      <div class="card-header">
+        <h5>{{ title }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label">Select File Type</label>
+          <select v-model="fileType" class="form-select">
+            <option value="EXCEL">Excel</option>
+          </select>
         </div>
-        <div class="card-body">
-          <div class="mb-3">
-            <label class="form-label">Select File Type</label>
-            <select v-model="fileType" class="form-select">
-              <option value="EXCEL">Excel</option>
-            </select>
+
+        <div class="mb-3">
+          <label class="form-label">Upload {{ fileType }} File</label>
+          <input
+            class="form-control"
+            type="file"
+            :accept="fileType === 'JSON' ? '.json' : '.xlsx, .xls, .xlsm'"
+            @change="handleFileChange"
+          />
+        </div>
+
+        <div v-if="errorMessage" class="alert alert-danger mt-3">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          @click="fileProsesUpload"
+          :disabled="isFileNotReady"
+          class="btn btn-primary mt-3"
+        >
+          <span v-if="isProses" class="d-flex align-items-center gap-2">
+            <span class="spinner-border spinner-border-sm" role="status"></span>
+            Processing...
+          </span>
+          <span v-else>Process</span>
+        </button>
+
+        <Properties>
+          <PropertiesItem
+            :input-properties="fileName"
+            input-label="File Name"
+            input-properties-error="File didn't process yet"
+          />
+          <PropertiesItem
+            :input-properties="docNoApp"
+            input-label="Document Number"
+            input-properties-error="Not specified"
+          />
+          <PropertiesItem
+            :input-properties="userNik"
+            input-label="JSON Name"
+            input-properties-error="Not specified"
+          />
+        </Properties>
+
+        <div v-if="fileData" class="card mt-4">
+          <div class="card-header">
+            Result Upload Data ({{ fileData.type.toUpperCase() }})
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th v-for="(header, index) in fileData.headers" :key="index">
+                    {{ header }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, rowIndex) in fileData.data" :key="rowIndex">
+                  <td v-for="(value, key) in row" :key="key">
+                    {{ value === null ? "null" : value }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div v-if="fileData && fileData.type === 'json'" class="card mt-3">
+          <div class="card">
+            <div class="card-header">Raw JSON Data</div>
+            <pre class="bg-light p-3 rounded">{{
+              JSON.stringify(fileData.data, null, 2)
+            }}</pre>
+          </div>
+        </div>
+
+        <div v-if="fileData" class="d-flex gap-4">
+          <div class="mt-4 d-flex gap-2">
+            <button
+              @click="downloadJson"
+              class="btn btn-success"
+              :disabled="isProses"
+            >
+              Download JSON Template
+            </button>
           </div>
 
-          <div class="mb-3">
-            <label class="form-label">Upload {{ fileType }} File</label>
-            <input
-              class="form-control"
-              type="file"
-              :accept="fileType === 'JSON' ? '.json' : '.xlsx, .xls, .xlsm'"
-              @change="handleFileChange"
-            />
+          <div class="mt-4 d-flex gap-2">
+            <button
+              @click="handlePreviewJsonTemplate"
+              class="btn btn-primary"
+              :disabled="isProses"
+            >
+              Preview JSON Template
+            </button>
           </div>
+        </div>
 
-          <div v-if="errorMessage" class="alert alert-danger mt-3">
-            {{ errorMessage }}
-          </div>
+        <div
+          v-if="isPreviewJsonTemplate"
+          class="modal-overlay"
+          @click="isPreviewJsonTemplate = false"
+        >
+          <div class="modal-dialog" @click.stop>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Preview JSON Data</h5>
 
-          <button
-            @click="fileProsesUpload"
-            :disabled="isFileNotReady"
-            class="btn btn-primary mt-3"
-          >
-            <span v-if="isProses" class="d-flex align-items-center gap-2">
-              <span
-                class="spinner-border spinner-border-sm"
-                role="status"
-              ></span>
-              Processing...
-            </span>
-            <span v-else>Process</span>
-          </button>
-
-          <Properties>
-            <PropertiesItem
-              :input-properties="fileName"
-              input-label="File Name"
-              input-properties-error="File didn't process yet"
-            />
-            <PropertiesItem
-              :input-properties="docNoApp"
-              input-label="Document Number"
-              input-properties-error="Not specified"
-            />
-            <PropertiesItem
-              :input-properties="userNik"
-              input-label="JSON Name"
-              input-properties-error="Not specified"
-            />
-          </Properties>
-
-          <div v-if="fileData" class="card mt-4">
-            <div class="card-header">
-              Result Upload Data ({{ fileData.type.toUpperCase() }})
-            </div>
-            <div class="table-responsive">
-              <table class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th
-                      v-for="(header, index) in fileData.headers"
-                      :key="index"
-                    >
-                      {{ header }}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(row, rowIndex) in fileData.data" :key="rowIndex">
-                    <td v-for="(value, key) in row" :key="key">
-                      {{ value === null ? "null" : value }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div v-if="fileData && fileData.type === 'json'" class="card mt-3">
-            <div class="card">
-              <div class="card-header">Raw JSON Data</div>
-              <pre class="bg-light p-3 rounded">{{
-                JSON.stringify(fileData.data, null, 2)
-              }}</pre>
-            </div>
-          </div>
-
-          <div v-if="fileData" class="d-flex gap-4">
-            <div class="mt-4 d-flex gap-2">
-              <button
-                @click="downloadJson"
-                class="btn btn-success"
-                :disabled="isProses"
-              >
-                Download JSON Template
-              </button>
-            </div>
-
-            <div class="mt-4 d-flex gap-2">
-              <button
-                @click="handlePreviewJsonTemplate"
-                class="btn btn-primary"
-                :disabled="isProses"
-              >
-                Preview JSON Template
-              </button>
-            </div>
-          </div>
-
-          <div
-            v-if="isPreviewJsonTemplate"
-            class="modal-overlay"
-            @click="isPreviewJsonTemplate = false"
-          >
-            <div class="modal-dialog" @click.stop>
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Preview JSON Data</h5>
-
-                  <div class="d-flex gap-2 align-items-center">
-                    <span v-show="copyStatus" class="text-success">{{
-                      copyStatus
-                    }}</span>
-                    <button class="btn btn-secondary" @click="copyToClipboard">
-                      <span class="fw-bold"
-                        ><svg
-                          class="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            fill-rule="evenodd"
-                            d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
-                            clip-rule="evenodd"
-                          />
-                          <path
-                            fill-rule="evenodd"
-                            d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
-                            clip-rule="evenodd"
-                          />
-                        </svg>
-                        Copy</span
+                <div class="d-flex gap-2 align-items-center">
+                  <span v-show="copyStatus" class="text-success">{{
+                    copyStatus
+                  }}</span>
+                  <button class="btn btn-secondary" @click="copyToClipboard">
+                    <span class="fw-bold"
+                      ><svg
+                        class="w-6 h-6 text-gray-800 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                    </button>
-                    <button
-                      class="btn btn-primary"
-                      @click="isPreviewJsonTemplate = false"
+                        <path
+                          fill-rule="evenodd"
+                          d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
+                          clip-rule="evenodd"
+                        />
+                        <path
+                          fill-rule="evenodd"
+                          d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                      Copy</span
                     >
-                      <span class="fw-bold"
-                        ><svg
-                          class="w-6 h-6 text-gray-800 dark:text-white"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke="currentColor"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M6 18 17.94 6M18 18 6.06 6"
-                          />
-                        </svg>
-                      </span>
-                    </button>
-                  </div>
+                  </button>
+                  <button
+                    class="btn btn-primary"
+                    @click="isPreviewJsonTemplate = false"
+                  >
+                    <span class="fw-bold"
+                      ><svg
+                        class="w-6 h-6 text-gray-800 dark:text-white"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M6 18 17.94 6M18 18 6.06 6"
+                        />
+                      </svg>
+                    </span>
+                  </button>
                 </div>
-                <div class="modal-body">
-                  <pre class="bg-light p-3 rounded">{{
-                    previewJsonTemplate
-                  }}</pre>
-                </div>
+              </div>
+              <div class="modal-body">
+                <pre class="bg-light p-3 rounded">{{
+                  previewJsonTemplate
+                }}</pre>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@
 import Layout from "../components/Layout.vue";
 import { useTemplateStore } from "../store/templateStore.js";
 import { storeToRefs } from "pinia";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
 
@@ -39,11 +39,12 @@ const validateNik = () => {
     localUserNik.value = localUserNik.value.slice(0, 8);
     return false;
   }
-  if (!localUserNik.value) {
+  if (!localUserNik.value || !localUserNik.value.length < 1) {
     nikError.value = "NIK is required";
     return false;
   }
   nikError.value = "";
+  console.log("validate nik called");
   return true;
 };
 
@@ -69,17 +70,13 @@ const handleDocNoInput = (event) => {
 watch([localDocNoApp, localUserNik], () => {
   updateTemplatePreview();
 });
-
-onMounted(() => {
-  updateTemplatePreview();
-});
 </script>
 
 <template>
   <Layout>
     <div class="card">
       <div class="card-header">
-        <h5 class="text-black">{{ title }}</h5>
+        <h5>{{ title }}</h5>
       </div>
       <div class="card-body">
         <form @submit.prevent>
@@ -105,7 +102,7 @@ onMounted(() => {
           <div class="mb-3">
             <label for="user nik" class="form-label">User NIK</label>
             <input
-              type="text"
+              type="number"
               v-model="localUserNik"
               class="form-control"
               id="userNik"
@@ -131,7 +128,7 @@ onMounted(() => {
           />
         </Properties>
 
-        <div class="mt-4">
+        <div v-if="templatePreview" class="mt-4">
           <div class="card">
             <div class="card-header">Template JSON Structure</div>
             <div class="card-body">

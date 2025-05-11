@@ -5,9 +5,7 @@ import Form from "./Form.vue";
 <template>
   <div class="col-md-9">
     <!-- Content for the right column -->
-    <div class="p-3 border bg-white">
-      <slot />
-    </div>
+    <slot />
   </div>
 </template>
 
