@@ -1,29 +1,11 @@
 import { defineStore } from "pinia";
-
-function generateSenderDocNo() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, "0");
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const year = String(now.getFullYear()).slice(-2);
-  const randomNum = String(Math.floor(Math.random() * 999999) + 1).padStart(
-    6,
-    "0",
-  );
-  return `${day}${month}${year}R${randomNum}`;
-}
-
-function generateDocNoApp(prefix = "J") {
-  const year = new Date().getFullYear().toString().slice(-2); // "25"
-  const randomNum = Math.floor(100000 + Math.random() * 900000); // 6-digit random
-  const paddedNum = randomNum.toString().padStart(12, "0"); // "000000123456"
-  return year + prefix + paddedNum;
-}
+import { Utils } from "../utils/Utils.js";
 
 const userNik = "1000082742";
 
 export const useTemplateStore = defineStore("templateStore", {
   state: () => ({
-    docNoApp: generateDocNoApp(),
+    docNoApp: Utils.generateDocNoApp(),
     jumlahRow: 0,
     jumlahAmout: 0,
     userNik: userNik,
@@ -31,7 +13,7 @@ export const useTemplateStore = defineStore("templateStore", {
     fastSeqNo: "1",
     jsonName: "MASTER",
     sourceSystem: "AMAN",
-    senderDocNo: generateSenderDocNo(),
+    senderDocNo: Utils.generateSenderDocNo(),
   }),
   getters: {},
   actions: {

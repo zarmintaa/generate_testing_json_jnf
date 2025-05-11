@@ -3,22 +3,10 @@ import { defineStore } from "pinia";
 import * as ExcelJS from "exceljs";
 
 // Fungsi untuk generate nomor dokumen dengan format DDMMYYR######
-function generateDocNo() {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, "0");
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const year = String(now.getFullYear()).slice(-2);
-  const randomNum = String(Math.floor(Math.random() * 999999) + 1).padStart(
-    6,
-    "0",
-  );
-  return `${day}${month}${year}R${randomNum}`;
-}
 
 export const useFileStore = defineStore("file", {
   state: () => ({
     fileType: "EXCEL",
-    docNo: generateDocNo(),
     isProses: false,
     fileData: null,
     errorMessage: null,
@@ -27,17 +15,7 @@ export const useFileStore = defineStore("file", {
     excelFileInput: null,
     jsonName: "MASTER",
     sourceSystem: "AMAN",
-    template: {
-      data: [
-        {
-          fastSeqNo: "1",
-          msgContent: [],
-          jsonName: "MASTER",
-          sourceSystem: "AMAN",
-          senderDocNo: generateDocNo(),
-        },
-      ],
-    },
+
     uploadedTemplate: null,
   }),
 
@@ -76,27 +54,6 @@ export const useFileStore = defineStore("file", {
         console.error("Error loading template:", error);
         throw error;
       }
-    },
-
-    setJsonTemplateProperties(payload) {
-      const currentTemplate = JSON.parse(JSON.stringify(this.currentTemplate));
-
-      const updatedTemplate = {
-        data: currentTemplate.data.map((item) => ({
-          ...item,
-          jsonName: payload.jsonName || this.jsonName,
-          sourceSystem: payload.sourceSystem || this.sourceSystem,
-          senderDocNo: payload.docNo || generateDocNo(),
-        })),
-      };
-
-      if (this.uploadedTemplate) {
-        this.uploadedTemplate = updatedTemplate;
-      } else {
-        this.template = updatedTemplate;
-      }
-
-      return updatedTemplate;
     },
 
     async processFile() {
