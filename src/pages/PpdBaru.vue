@@ -6,6 +6,7 @@ import { ref } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
 import { useTemplateStore } from "../store/templateStore.js";
+import { constant } from "../utils/Constant.js";
 
 const fileStore = useFileStore();
 const templateStore = useTemplateStore();
@@ -61,7 +62,7 @@ const copyToClipboard = async () => {
 const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
-      templateStore.setData(fileData.value.data, "disburse");
+      templateStore.setData(fileData.value.data, constant.disburse);
     }
   });
   isFileNotReady.value = !isFileNotReady.value;

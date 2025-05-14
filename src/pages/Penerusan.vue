@@ -68,7 +68,7 @@ const copyToClipboard = async () => {
 const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
-      templateStore.setData(fileData.value.data, "penerusan");
+      templateStore.setData(fileData.value.data, constant.penerusan);
     }
   });
   isFileNotReady.value = !isFileNotReady.value;

@@ -174,7 +174,7 @@ export const useFileStore = defineStore("file", {
       const a = document.createElement("a");
       a.href = url;
       a.download = `export_${new Date().toISOString().slice(0, 10)}_${
-        this.docNo
+        this.fileName
       }.json`;
       a.click();
       URL.revokeObjectURL(url);

@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { Utils } from "../utils/Utils.js";
+import { constant, disburse } from "../utils/Constant.js";
 
 const userNik = "1000082742";
 
@@ -66,16 +67,24 @@ export const useTemplateStore = defineStore("templateStore", {
       }
     },
 
-    setData(data, type = "disburse") {
-      if (type === "disburse") {
+    setData(data, type) {
+      if (type === constant.disburse) {
         if (!data) this.data = [];
-        this.data = data.map((record) => JSON.stringify(record));
+        this.data = data.map((record) =>
+          JSON.stringify({ data: { ...record } }),
+        );
+        return;
       }
 
-      this.data = data.map((record) => record);
-      this.setJumlahRow();
-      this.setJumlahAmount();
-      this.setDocNoApp();
+      if (type === constant.penerusan) {
+        this.data = data.map((record) => record);
+        this.setJumlahRow();
+        this.setJumlahAmount();
+        this.setDocNoApp();
+        return;
+      }
+
+      return null;
     },
 
     setJumlahRow() {
