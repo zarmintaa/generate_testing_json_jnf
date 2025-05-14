@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { Utils } from "../utils/Utils.js";
-import { constant, disburse } from "../utils/Constant.js";
+import { constant } from "../utils/Constant.js";
 
 const userNik = "1000082742";
 
