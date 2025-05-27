@@ -6,6 +6,7 @@ import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import PropertiesItem from "../components/blocks/PropertiesItem.vue";
 import Properties from "../components/blocks/Properties.vue";
+import {constant} from "../utils/Constant.js";
 
 const fileStore = useFileStore();
 const templateStore = useTemplateStore();
@@ -69,6 +70,7 @@ const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
       templateStore.setData(fileData.value.data, constant.penerusan);
+      console.log({data: fileData.value.data})
     }
   });
   isFileNotReady.value = !isFileNotReady.value;
