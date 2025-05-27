@@ -70,11 +70,14 @@ const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
       templateStore.setData(fileData.value.data, constant.penerusan);
-      console.log({data: fileData.value.data})
     }
   });
   isFileNotReady.value = !isFileNotReady.value;
 };
+
+const handleDownloadJson = () => {
+  downloadJson(JSON.parse(templateStore.getPenerusanRequest()))
+}
 </script>
 
 <template>
@@ -171,7 +174,7 @@ const fileProsesUpload = async () => {
         <div v-if="fileData" class="d-flex gap-4">
           <div class="mt-4 d-flex gap-2">
             <button
-              @click="downloadJson"
+              @click="handleDownloadJson"
               class="btn btn-success"
               :disabled="isProses"
             >

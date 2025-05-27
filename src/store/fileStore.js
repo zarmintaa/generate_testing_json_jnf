@@ -164,10 +164,10 @@ export const useFileStore = defineStore("file", {
       return JSON.stringify(this.formattedData, null, 2);
     },
 
-    downloadJson() {
+    downloadJson(jsonData) {
       if (!this.fileData) return;
 
-      const blob = new Blob([JSON.stringify(this.formattedData, null, 2)], {
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
         type: "application/json",
       });
       const url = URL.createObjectURL(blob);

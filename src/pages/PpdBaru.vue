@@ -67,6 +67,10 @@ const fileProsesUpload = async () => {
   });
   isFileNotReady.value = !isFileNotReady.value;
 };
+
+const downloadJsonHandler = () => {
+  downloadJson(JSON.parse(templateStore.getDisburseRequest()))
+}
 </script>
 
 <template>
@@ -168,7 +172,7 @@ const fileProsesUpload = async () => {
         <div v-if="fileData" class="d-flex gap-4">
           <div class="mt-4 d-flex gap-2">
             <button
-              @click="downloadJson"
+              @click="downloadJsonHandler"
               class="btn btn-success"
               :disabled="isProses"
             >
