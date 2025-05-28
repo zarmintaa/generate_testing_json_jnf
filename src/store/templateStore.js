@@ -97,6 +97,7 @@ export const useTemplateStore = defineStore("templateStore", {
       if (this.data) {
         this.data.forEach((item) => {
           if (item.AIT_AMOUNT1) {
+            item.AIT_AMOUNT1 = +item.AIT_AMOUNT1;
             amount += item.AIT_AMOUNT1;
           } else {
             amount += 0;

@@ -85,16 +85,16 @@ onMounted(() => {
       <div class="card-body">
         <form @submit.prevent>
           <div class="mb-3">
-            <label for="docNoApp" class="form-label">DocNo App</label>
+            <label class="form-label" for="docNoApp">DocNo App</label>
             <input
-              type="text"
               v-model="localDocNoApp"
-              class="form-control"
               :class="{ 'is-invalid': docNoError }"
-              placeholder="DocNo App"
+              class="form-control"
               maxlength="16"
-              @input="handleDocNoInput"
+              placeholder="DocNo App"
+              type="text"
               @blur="validateDocNo"
+              @input="handleDocNoInput"
             />
             <div v-if="docNoError" class="invalid-feedback">
               {{ docNoError }}
@@ -104,13 +104,13 @@ onMounted(() => {
             </div>
           </div>
           <div class="mb-3">
-            <label for="user nik" class="form-label">User NIK</label>
+            <label class="form-label" for="user nik">User NIK</label>
             <input
-              type="number"
+              id="userNik"
               v-model="localUserNik"
               class="form-control"
-              id="userNik"
               placeholder="Enter Nik User"
+              type="number"
               @blur="validateNik"
             />
             <div v-if="nikError" class="invalid-feedback">

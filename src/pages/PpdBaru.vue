@@ -17,7 +17,7 @@ const { title } = defineProps({
 const { senderDocNo, jsonName, sourceSystem } = storeToRefs(templateStore);
 
 // Extract state and actions from the store
-const { fileType, docNo, isProses, fileData, errorMessage, fileName } =
+const { fileType, isProses, fileData, errorMessage, fileName } =
   storeToRefs(fileStore);
 
 const { processFile, downloadJson } = fileStore;
@@ -69,8 +69,8 @@ const fileProsesUpload = async () => {
 };
 
 const downloadJsonHandler = () => {
-  downloadJson(JSON.parse(templateStore.getDisburseRequest()))
-}
+  downloadJson(JSON.parse(templateStore.getDisburseRequest()));
+};
 </script>
 
 <template>
@@ -90,9 +90,9 @@ const downloadJsonHandler = () => {
         <div class="mb-3">
           <label class="form-label">Upload {{ fileType }} File</label>
           <input
+            :accept="fileType === 'JSON' ? '.json' : '.xlsx, .xls, .xlsm'"
             class="form-control"
             type="file"
-            :accept="fileType === 'JSON' ? '.json' : '.xlsx, .xls, .xlsm'"
             @change="handleFileChange"
           />
         </div>
@@ -102,9 +102,9 @@ const downloadJsonHandler = () => {
         </div>
 
         <button
-          @click="fileProsesUpload"
           :disabled="isFileNotReady"
           class="btn btn-primary mt-3"
+          @click="fileProsesUpload"
         >
           <span v-if="isProses" class="d-flex align-items-center gap-2">
             <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -172,9 +172,9 @@ const downloadJsonHandler = () => {
         <div v-if="fileData" class="d-flex gap-4">
           <div class="mt-4 d-flex gap-2">
             <button
-              @click="downloadJsonHandler"
-              class="btn btn-success"
               :disabled="isProses"
+              class="btn btn-success"
+              @click="downloadJsonHandler"
             >
               Download JSON Template
             </button>
@@ -182,9 +182,9 @@ const downloadJsonHandler = () => {
 
           <div class="mt-4 d-flex gap-2">
             <button
-              @click="handlePreviewJsonTemplate"
-              class="btn btn-primary"
               :disabled="isProses"
+              class="btn btn-primary"
+              @click="handlePreviewJsonTemplate"
             >
               Preview JSON Template
             </button>
@@ -208,23 +208,23 @@ const downloadJsonHandler = () => {
                   <button class="btn btn-secondary" @click="copyToClipboard">
                     <span class="fw-bold"
                       ><svg
-                        class="w-6 h-6 text-gray-800 dark:text-white"
                         aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        class="w-6 h-6 text-gray-800 dark:text-white"
                         fill="currentColor"
+                        height="24"
                         viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
-                          fill-rule="evenodd"
-                          d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
                           clip-rule="evenodd"
+                          d="M18 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1V9a4 4 0 0 0-4-4h-3a1.99 1.99 0 0 0-1 .267V5a2 2 0 0 1 2-2h7Z"
+                          fill-rule="evenodd"
                         />
                         <path
-                          fill-rule="evenodd"
-                          d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
                           clip-rule="evenodd"
+                          d="M8 7.054V11H4.2a2 2 0 0 1 .281-.432l2.46-2.87A2 2 0 0 1 8 7.054ZM10 7v4a2 2 0 0 1-2 2H4v6a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"
+                          fill-rule="evenodd"
                         />
                       </svg>
                       Copy</span
@@ -236,20 +236,20 @@ const downloadJsonHandler = () => {
                   >
                     <span class="fw-bold"
                       ><svg
-                        class="w-6 h-6 text-gray-800 dark:text-white"
                         aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
+                        class="w-6 h-6 text-gray-800 dark:text-white"
                         fill="none"
+                        height="24"
                         viewBox="0 0 24 24"
+                        width="24"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
                         <path
+                          d="M6 18 17.94 6M18 18 6.06 6"
                           stroke="currentColor"
                           stroke-linecap="round"
                           stroke-linejoin="round"
                           stroke-width="2"
-                          d="M6 18 17.94 6M18 18 6.06 6"
                         />
                       </svg>
                     </span>
