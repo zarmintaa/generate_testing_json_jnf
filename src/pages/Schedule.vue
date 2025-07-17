@@ -11,7 +11,7 @@ const { title } = defineProps({
 });
 
 const senderDocNo = ref(Utils.generateSenderDocNo());
-const jsonName = ref("SCHED");
+const jsonName = ref("SCHD");
 const sourceSystem = ref("AMAN");
 const fileType = ref("EXCEL");
 
