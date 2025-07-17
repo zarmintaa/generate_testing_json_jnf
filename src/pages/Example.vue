@@ -8,7 +8,7 @@ import Properties from "../components/blocks/Properties.vue";
 // Import composables
 import { useFormValidation } from "../composables/useFormValidation";
 import { useFileUpload } from "../composables/useFileUpload";
-import { useJsonTemplate } from "../composables/useJsonTemplate";
+import { useCustomTemplate } from "../composables/useCustomTemplate";
 
 const { title } = defineProps({
   title: String,
@@ -42,27 +42,48 @@ const {
 } = useFileUpload();
 
 const {
+  generateInvoiceTemplate,
+  generatePurchaseOrderTemplate,
+  generateCustomTemplate,
   isPreviewJsonTemplate,
   copyStatus,
-  generateTemplate,
   downloadJson,
   copyToClipboard,
   handlePreviewJsonTemplate,
-} = useJsonTemplate();
+} = useCustomTemplate();
 
-// Initialize default values
+// Initialize default values for Invoice
 senderDocNo.value = Utils.generateSenderDocNo();
-jsonName.value = "SCHD";
-sourceSystem.value = "AMAN";
+jsonName.value = "INVOICE";
+sourceSystem.value = "FINANCE";
+
+// Template types
+const templateTypes = [
+  { value: "INVOICE", label: "Invoice Template" },
+  { value: "PURCHASE_ORDER", label: "Purchase Order Template" },
+  { value: "CUSTOM", label: "Custom Template" },
+];
 
 // Template preview untuk struktur JSON saja (tanpa data file)
 const templatePreview = computed(() => {
   if (validateAll()) {
-    return generateTemplate({
+    const config = {
       senderDocNo: senderDocNo.value,
       jsonName: jsonName.value,
       sourceSystem: sourceSystem.value,
-    });
+    };
+
+    // Choose template based on jsonName
+    switch (jsonName.value) {
+      case "INVOICE":
+        return generateInvoiceTemplate(config);
+      case "PURCHASE_ORDER":
+        return generatePurchaseOrderTemplate(config);
+      case "CUSTOM":
+        return generateCustomTemplate(config);
+      default:
+        return generateInvoiceTemplate(config); // fallback
+    }
   }
   return null;
 });
@@ -70,33 +91,29 @@ const templatePreview = computed(() => {
 // Template dengan data hasil scan file untuk download
 const templateWithFileData = computed(() => {
   if (validateAll()) {
-    return generateTemplate(
-      {
-        senderDocNo: senderDocNo.value,
-        jsonName: jsonName.value,
-        sourceSystem: sourceSystem.value,
-      },
-      fileData,
-    );
+    const config = {
+      senderDocNo: senderDocNo.value,
+      jsonName: jsonName.value,
+      sourceSystem: sourceSystem.value,
+    };
+
+    // Choose template based on jsonName
+    switch (jsonName.value) {
+      case "INVOICE":
+        return generateInvoiceTemplate(config, fileData);
+      case "PURCHASE_ORDER":
+        return generatePurchaseOrderTemplate(config, fileData);
+      case "CUSTOM":
+        return generateCustomTemplate(config, fileData);
+      default:
+        return generateInvoiceTemplate(config, fileData); // fallback
+    }
   }
   return null;
 });
 
 const previewJsonTemplate = computed(() => {
   return JSON.stringify(templateWithFileData.value, null, 2);
-});
-
-// Computed getters (if needed for compatibility)
-const getSenderDocNo = () => {
-  return docNoError.value;
-};
-
-const getJsonName = computed(() => {
-  return jsonName.value;
-});
-
-const getSourceSystem = computed(() => {
-  return sourceSystem.value;
 });
 
 // File processing
@@ -116,6 +133,12 @@ const downloadJsonHandler = () => {
 // Copy handler
 const copyToClipboardHandler = async () => {
   await copyToClipboard(templateWithFileData.value);
+};
+
+// Handle template type change
+const handleTemplateTypeChange = () => {
+  // You can add specific logic here when template type changes
+  validateJsonName();
 };
 </script>
 
@@ -149,16 +172,23 @@ const copyToClipboardHandler = async () => {
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="jsonName">JSON Name</label>
-            <input
+            <label class="form-label" for="jsonName">Template Type</label>
+            <select
               id="jsonName"
               v-model="jsonName"
               :class="{ 'is-invalid': jsonNameError }"
-              class="form-control"
-              placeholder="Enter JSON Name"
-              type="text"
-              @blur="validateJsonName"
-            />
+              class="form-select"
+              @change="handleTemplateTypeChange"
+            >
+              <option value="">Select Template Type</option>
+              <option
+                v-for="template in templateTypes"
+                :key="template.value"
+                :value="template.value"
+              >
+                {{ template.label }}
+              </option>
+            </select>
             <div v-if="jsonNameError" class="invalid-feedback">
               {{ jsonNameError }}
             </div>
@@ -189,7 +219,7 @@ const copyToClipboardHandler = async () => {
           />
           <PropertiesItem
             :input-properties="jsonName"
-            input-label="JSON Name"
+            input-label="Template Type"
             input-properties-error="Not specified"
           />
           <PropertiesItem
@@ -201,7 +231,9 @@ const copyToClipboardHandler = async () => {
 
         <div v-if="templatePreview" class="mt-4">
           <div class="card">
-            <div class="card-header">Template JSON Structure</div>
+            <div class="card-header">
+              Template JSON Structure - {{ jsonName }}
+            </div>
             <div class="card-body p-0">
               <pre class="bg-light p-3 rounded">{{
                 JSON.stringify(templatePreview, null, 2)
@@ -222,7 +254,7 @@ const copyToClipboardHandler = async () => {
             <label class="form-label">Select File Type</label>
             <select v-model="fileType" class="form-select">
               <option value="EXCEL">Excel</option>
-              <!--              <option value="JSON">JSON</option>-->
+              <option value="JSON">JSON</option>
             </select>
           </div>
 
@@ -234,6 +266,22 @@ const copyToClipboardHandler = async () => {
               type="file"
               @change="handleFileChange"
             />
+          </div>
+
+          <!-- Template-specific file format hints -->
+          <div v-if="jsonName" class="alert alert-info">
+            <strong>{{ jsonName }} Template Expected Columns:</strong>
+            <ul class="mb-0 mt-2">
+              <li v-if="jsonName === 'INVOICE'">
+                itemCode, description, quantity, unitPrice
+              </li>
+              <li v-if="jsonName === 'PURCHASE_ORDER'">
+                productCode, productName, quantity, unitPrice, deliveryDate
+              </li>
+              <li v-if="jsonName === 'CUSTOM'">
+                Any columns (will be processed as generic data)
+              </li>
+            </ul>
           </div>
 
           <div v-if="errorMessage" class="alert alert-danger mt-3">
@@ -268,7 +316,7 @@ const copyToClipboardHandler = async () => {
             />
             <PropertiesItem
               :input-properties="jsonName"
-              input-label="JSON Name"
+              input-label="Template Type"
               input-properties-error="Not specified"
             />
             <PropertiesItem
@@ -305,15 +353,6 @@ const copyToClipboardHandler = async () => {
             </div>
           </div>
 
-          <div v-if="fileData && fileData.type === 'json'" class="card mt-3">
-            <div class="card">
-              <div class="card-header">Raw JSON Data</div>
-              <pre class="bg-light p-3 rounded">{{
-                JSON.stringify(fileData.data, null, 2)
-              }}</pre>
-            </div>
-          </div>
-
           <div v-if="fileData" class="d-flex gap-4">
             <div class="mt-4 d-flex gap-2">
               <button
@@ -321,7 +360,7 @@ const copyToClipboardHandler = async () => {
                 class="btn btn-success"
                 @click="downloadJsonHandler"
               >
-                Download JSON Template
+                Download {{ jsonName }} Template
               </button>
             </div>
 
@@ -331,7 +370,7 @@ const copyToClipboardHandler = async () => {
                 class="btn btn-primary"
                 @click="handlePreviewJsonTemplate"
               >
-                Preview JSON Template
+                Preview {{ jsonName }} Template
               </button>
             </div>
           </div>
@@ -345,7 +384,7 @@ const copyToClipboardHandler = async () => {
             <div class="modal-dialog" @click.stop>
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title">Preview JSON Data</h5>
+                  <h5 class="modal-title">Preview {{ jsonName }} Template</h5>
 
                   <div class="d-flex gap-2 align-items-center">
                     <span v-show="copyStatus" class="text-success">{{
@@ -355,8 +394,8 @@ const copyToClipboardHandler = async () => {
                       class="btn btn-secondary"
                       @click="copyToClipboardHandler"
                     >
-                      <span class="fw-bold"
-                        ><svg
+                      <span class="fw-bold">
+                        <svg
                           aria-hidden="true"
                           class="w-6 h-6 text-gray-800 dark:text-white"
                           fill="currentColor"
@@ -376,15 +415,15 @@ const copyToClipboardHandler = async () => {
                             fill-rule="evenodd"
                           />
                         </svg>
-                        Copy</span
-                      >
+                        Copy
+                      </span>
                     </button>
                     <button
                       class="btn btn-primary"
                       @click="isPreviewJsonTemplate = false"
                     >
-                      <span class="fw-bold"
-                        ><svg
+                      <span class="fw-bold">
+                        <svg
                           aria-hidden="true"
                           class="w-6 h-6 text-gray-800 dark:text-white"
                           fill="none"
