@@ -33,15 +33,21 @@ export class Utils {
       },
       {
         routeName: {
-          name: "ppd-baru",
+          name: "master",
         },
-        pageTitle: "PPD Baru",
+        pageTitle: "Master",
       },
       {
         routeName: {
           name: "penerusan",
         },
         pageTitle: "Penerusan",
+      },
+      {
+        routeName: {
+          name: "schedule",
+        },
+        pageTitle: "Schedule",
       },
     ];
   }

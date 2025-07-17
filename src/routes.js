@@ -23,11 +23,11 @@ export const routes = createRouter({
       },
     },
     {
-      path: "/ppd-baru",
-      component: () => import("./pages/PpdBaru.vue"),
-      name: "ppd-baru",
+      path: "/master",
+      component: () => import("./pages/Master.vue"),
+      name: "master",
       props: {
-        title: "PPD Baru",
+        title: "Master",
       },
     },
     {
@@ -36,6 +36,14 @@ export const routes = createRouter({
       name: "penerusan",
       props: {
         title: "Penerusan",
+      },
+    },
+    {
+      path: "/schedule",
+      component: () => import("./pages/Schedule.vue"),
+      name: "schedule",
+      props: {
+        title: "Schedule",
       },
     },
   ],

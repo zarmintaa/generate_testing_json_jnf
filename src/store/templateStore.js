@@ -70,6 +70,7 @@ export const useTemplateStore = defineStore("templateStore", {
     setData(data, type) {
       if (type === constant.disburse) {
         if (!data) this.data = [];
+
         this.data = data.map((record) =>
           JSON.stringify({ data: { ...record } }),
         );

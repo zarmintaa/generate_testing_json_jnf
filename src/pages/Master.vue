@@ -59,9 +59,69 @@ const copyToClipboard = async () => {
   }
 };
 
+const setIntegerValue = (data) => {
+  console.log("set integer value called!");
+  return data.map((item) => {
+    if (item.LTV) {
+      item.LTV = +item.LTV;
+    }
+    if (item.DSR) {
+      item.DSR = +item.DSR;
+    }
+
+    if (item.FUND_REASON_TYPE) {
+      item.FUND_REASON_TYPE = +item.FUND_REASON_TYPE;
+    }
+
+    if (item.FUND_OBJT_PRICE) {
+      item.FUND_OBJT_PRICE = +item.FUND_OBJT_PRICE;
+    }
+
+    if (item.FUND_NET_DP) {
+      item.FUND_NET_DP = +item.FUND_NET_DP;
+    }
+
+    if (item.FUND_ADMF_PRIN) {
+      item.FUND_ADMF_PRIN = +item.FUND_ADMF_PRIN;
+    }
+
+    if (item.FUND_ADMF_TOP) {
+      item.FUND_ADMF_TOP = +item.FUND_ADMF_TOP;
+    }
+
+    if (item.FUND_OBJT_CODE) {
+      item.FUND_OBJT_CODE = +item.FUND_OBJT_CODE;
+    }
+
+    if (item.AREC_CONT_VER) {
+      item.AREC_CONT_VER = +item.AREC_CONT_VER;
+    }
+
+    if (item.AREC_INST_NO) {
+      item.AREC_INST_NO = +item.AREC_INST_NO;
+    }
+
+    if (item.AREC_INST_PRIN) {
+      item.AREC_INST_PRIN = +item.AREC_INST_PRIN;
+    }
+
+    if (item.AREC_INST_INTR) {
+      item.AREC_INST_INTR = +item.AREC_INST_INTR;
+    }
+
+    if (item.AREC_PNLT_CALC) {
+      item.AREC_PNLT_CALC = +item.AREC_PNLT_CALC;
+    }
+    return item;
+  });
+};
+
 const fileProsesUpload = async () => {
   processFile().then(() => {
     if (fileData) {
+      // const formatedInt = setIntegerValue(fileData.value.data);
+      // console.log({ formatedInt });
+      // templateStore.setData(formatedInt, constant.disburse);
       templateStore.setData(fileData.value.data, constant.disburse);
     }
   });
