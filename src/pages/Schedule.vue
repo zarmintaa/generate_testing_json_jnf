@@ -469,7 +469,7 @@ const copyToClipboard = async () => {
             <div class="card-header">
               Result Upload Data ({{ fileData.type.toUpperCase() }})
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive max-h">
               <table class="table table-bordered">
                 <thead>
                   <tr>
@@ -604,6 +604,10 @@ const copyToClipboard = async () => {
 </template>
 
 <style scoped>
+.max-h {
+  max-height: 600px;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
