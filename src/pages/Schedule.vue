@@ -478,4 +478,10 @@ const copyToClipboardHandler = async () => {
   padding: 1rem;
   border-radius: 0.25rem;
 }
+
+.table-responsive {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
 </style>
